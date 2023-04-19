@@ -21,12 +21,13 @@ public class MeasurementsController: ControllerBase
 
     [HttpGet]
     public Measurement[] GetMeasurements(
-        [FromQuery] int? count, 
+        [FromQuery] int? count,
+        [FromQuery] int? skip,
+        [FromQuery] string? location,
         [FromQuery] DateTime? start,
-        [FromQuery] DateTime? stop,
-        [FromQuery] string? location)
+        [FromQuery] DateTime? stop)
     {
-        return _measurementsRepository.AllMeasurements(count ?? 100, start, stop, location);
+        return _measurementsRepository.AllMeasurements(count ?? 100, skip ?? 0, location, start, stop);
     }
     
     [HttpGet]
@@ -43,6 +44,10 @@ public class MeasurementsController: ControllerBase
         return ActionResultFor(_measurementsRepository.GetMaxMeasurementBy(m => m.Date, location));
     }
     
+    // [HttpGet]
+    // [Route("statistics")]
+    // TODO: Add method GetMeasurementStatistics
+
     [HttpGet]
     [Route("min-temperature")]
     public ActionResult<Measurement> GetLowestTemperature([FromQuery] string? location)
@@ -72,7 +77,7 @@ public class MeasurementsController: ControllerBase
     }
     
     [HttpPut]
-    public ActionResult<Measurement> PutMeasurement([FromBody] Measurement measurement)
+    public Measurement PutMeasurement([FromBody] Measurement measurement)
     {
         return _measurementsRepository.Add(measurement);
     }

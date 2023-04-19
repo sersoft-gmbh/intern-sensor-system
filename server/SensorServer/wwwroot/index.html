@@ -15,14 +15,19 @@
     <script src="js/main.js" type="text/javascript" charset="utf-8" defer></script>
    </head>
    <body>
-    <div class="container bg-secondary-subtle p-3 rounded">
+    <div class="container bg-secondary-subtle p-3 mt-2 rounded">
         <h1 class="p-4">Sensor Values</h1>
 
-        <div class="container">
-            <div class="row">
-                <div id="latest-container" class="col"></div>
-                <div id="min-container" class="col"></div>
-                <div id="max-container" class="col"></div>
+        <div class="card text-center">
+            <div class="card-header" id="locations-container">
+            </div>
+            <div class="card-body">
+                <h5 class="card-title" id="current-location-name"></h5>
+                <div class="row">
+                    <div id="latest-container" class="col"></div>
+                    <div id="min-container" class="col"></div>
+                    <div id="max-container" class="col"></div>
+                </div>
             </div>
         </div>
         
@@ -30,7 +35,6 @@
             <h2>Latest</h2>
             <p>
                 <span id="latest-date"></span>
-                &nbsp;at&nbsp;
                 <span id="latest-location"></span>
             </p>
             <p>
@@ -45,6 +49,16 @@
             <h2><span id="min-or-max" class="capitalized"></span></h2>
             <p><span id="min-max-temperature-celsius"></span> (<span id="min-max-temperature-date"></span>)</p>
             <p><span id="min-max-humidity-percent"></span> (<span id="min-max-humidity-date"></span>)</p>
+        </template>
+
+        <template id="tmpl-location-list">
+            <ul class="nav nav-tabs card-header-tabs" id="locations-list"></ul>
+        </template>
+
+        <template id="tmpl-location-entry">
+            <li class="nav-item">
+                <a class="nav-link" id="location-name" href="#"></a>
+            </li>
         </template>
     </div>
    </body>

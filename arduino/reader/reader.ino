@@ -1,4 +1,5 @@
 #include <ctime>
+#include <set>
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoHttpClient.h>
@@ -12,15 +13,25 @@
 
 #define DHTPIN 4
 
+#define BTNPIN 5
+
+#define REDPIN 16
+#define GREENPIN 14
+#define BLUEPIN 12
+
 #define READ_INTERVAL 1000
+
+enum Color { red, green, blue };
 
 const String endpoint = "/measurements";
 const String contentType = "application/json";
-const String location = "Office Desk";
 
 const char *ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 0;
 const int daylightOffset_sec = 3600;
+
+const String locations[2] = {"Office Desk", "Test"};
+volatile int locationIndex = 0;
 
 DHT dht(DHTPIN, DHT11);
 WiFiClientSecure wifi;
@@ -58,20 +69,55 @@ void setupTime() {
   Serial.print(asctime(&timeinfo));
 }
 
+void initLED(int pin) {
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, LOW);
+}
+
+bool isButtonPressed() {
+  return digitalRead(BTNPIN) == LOW;
+}
+
+void setLEDColor(std::set<enum Color> colors) {
+  digitalWrite(REDPIN, colors.find(red) != colors.end() ? HIGH : LOW);
+  digitalWrite(GREENPIN, colors.find(green) != colors.end() ? HIGH : LOW);
+  digitalWrite(BLUEPIN, colors.find(blue) != colors.end() ? HIGH : LOW);
+}
+
+ICACHE_RAM_ATTR void buttonPressed() {
+  Serial.println("Switching Location...");
+  if (locationIndex == 1) {
+    locationIndex = 0;
+  } else {
+    locationIndex++;
+  }
+}
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   dht.begin();
 
+  pinMode(BTNPIN, INPUT_PULLUP);
+  initLED(REDPIN);
+  initLED(GREENPIN);
+  initLED(BLUEPIN);
+  setLEDColor({blue});
+
+  attachInterrupt(digitalPinToInterrupt(BTNPIN), buttonPressed, FALLING);
+
   connectWifi();
   setupTime();
 
   wifi.setTrustAnchors(&cert);
+  setLEDColor({green, blue});
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   delay(READ_INTERVAL);
+
+  setLEDColor({red, blue});
 
   auto temp = dht.readTemperature();
   auto humidity = dht.readHumidity();
@@ -89,7 +135,7 @@ void loop() {
   String body = "{";
   body += "\"date\":\"" + String(curDate) + "\"";
   body += ",";
-  body += "\"location\":\"" + location + "\"";
+  body += "\"location\":\"" + locations[locationIndex] + "\"";
   body += ",";
   body += "\"temperatureCelsius\":" + String(temp, 10);
   body += ",";
@@ -99,18 +145,30 @@ void loop() {
   Serial.print("Request: "); 
   Serial.println(body);
 
+  String errorMessage;
   switch (client.put(endpoint, contentType, body)) {
-    case HTTP_SUCCESS: break;
-    case HTTP_ERROR_CONNECTION_FAILED: Serial.println("Connection failed!"); return;
-    case HTTP_ERROR_TIMED_OUT: Serial.println("Connection timed out!"); return;
-    case HTTP_ERROR_INVALID_RESPONSE: Serial.println("Invalid response!"); return;
-    case HTTP_ERROR_API: Serial.println("HTTP Client API error!"); return;
-    default: Serial.println("Unknown error"); return;
+    case HTTP_SUCCESS: errorMessage = ""; break;
+    case HTTP_ERROR_CONNECTION_FAILED: errorMessage = "Connection failed!"; break;
+    case HTTP_ERROR_TIMED_OUT: errorMessage = "Connection timed out!"; break;
+    case HTTP_ERROR_INVALID_RESPONSE: errorMessage = "Invalid response!"; break;
+    case HTTP_ERROR_API: errorMessage = "HTTP Client API error!"; break;
+    default: errorMessage = "Unknown error"; break;
+  }
+  if (!errorMessage.isEmpty()) {
+    setLEDColor({red});
+    Serial.println(errorMessage);
+    return;
   }
 
   auto statusCode = client.responseStatusCode();
   Serial.print("Status code: ");
   Serial.println(statusCode);
+
+  if (statusCode < 200 || statusCode >= 300) {
+    setLEDColor({red}); // red and green looks more green than yellow
+  } else {
+    setLEDColor({green});
+  }
 
   auto response = client.responseBody();
   Serial.print("Response: ");

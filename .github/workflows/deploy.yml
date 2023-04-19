@@ -1,0 +1,44 @@
+name: Deploy Docker Image
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+    branches:
+      - main
+    paths:
+      - '.github/workflows/deploy.yml'
+      - 'bin/**'
+      - 'server/**'
+      - 'Dockerfile'
+      - '.dockerignore'
+
+jobs:
+  determine-deployment-config:
+    uses: sersoft-gmbh/common-actions/.github/workflows/determine-deployment-config.yml@main
+
+  run-deployment:
+    needs: determine-deployment-config
+    if: ${{ needs.determine-deployment-config.outputs.should-deploy == 'true' }}
+    environment: ${{ needs.determine-deployment-config.outputs.environment }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: sersoft-gmbh/common-actions/docker/build-image@main
+        id: build-docker-image
+        with:
+          is-release: ${{ github.ref_type == 'tag' }}
+          release-tag: ${{ github.ref_name }}
+          sha: ${{ github.sha }}
+          docker-registry: ${{ vars.DOCKER_REGISTRY }}
+          docker-username: ${{ secrets.DOCKER_USERNAME }}
+          docker-password: ${{ secrets.DOCKER_PASSWORD }}
+          docker-image: ${{ vars.DOCKER_IMAGE }}
+          platforms: linux/amd64
+          ssh-key: ${{ secrets.BOT_SSH_KEY }}
+      - uses: sersoft-gmbh/common-actions/docker/deploy-image@main
+        with:
+          deployer-url: ${{ secrets.DEPLOYER_URL }}
+          deployer-token: ${{ secrets.DEPLOYER_TOKEN }}
+          docker-image: ${{ vars.DOCKER_IMAGE }}
+          version-tag: ${{ steps.build-docker-image.outputs.version-tag }}
+          latest-tag: ${{ steps.build-docker-image.outputs.latest-tag }}

@@ -1,7 +1,7 @@
 (async () => {
     'use strict'
     
-    const serverAddress = ".";
+    const serverAddress = window.location;
     
     function buildUrl(path, query) {
         let url = new URL(serverAddress);

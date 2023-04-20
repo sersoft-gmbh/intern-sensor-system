@@ -21,9 +21,11 @@ After that, create the files `apiserver.h` and `wificreds.h` in `reader` and fil
 #ifdef USE_LOCAL_SERVER
 const char *serverAddress = "LOCAL DEVELOPMENT SERVER IP";
 const int serverPort = 5076;
+const char *serverToken = "LOCAL SERVER TOKEN";
 #else
 const char *serverAddress = "DEPLOYED SERVER NAME";
 const int serverPort = 443;
+const char *serverToken = "DEPLOYED SERVER TOKEN";
 #endif /* USE_LOCAL_SERVER */
 
 #endif /* !APISERVER_H */

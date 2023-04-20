@@ -32,6 +32,7 @@ const int daylightOffset_sec = 3600;
 
 const String locations[2] = {"Office Desk", "Test"};
 volatile int locationIndex = 0;
+volatile bool locationChanged = false;
 
 DHT dht(DHTPIN, DHT11);
 WiFiClientSecure wifi;
@@ -74,23 +75,31 @@ void initLED(int pin) {
   digitalWrite(pin, LOW);
 }
 
-bool isButtonPressed() {
-  return digitalRead(BTNPIN) == LOW;
-}
-
 void setLEDColor(std::set<enum Color> colors) {
   digitalWrite(REDPIN, colors.find(red) != colors.end() ? HIGH : LOW);
   digitalWrite(GREENPIN, colors.find(green) != colors.end() ? HIGH : LOW);
   digitalWrite(BLUEPIN, colors.find(blue) != colors.end() ? HIGH : LOW);
 }
 
-ICACHE_RAM_ATTR void buttonPressed() {
+double mticks() {
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    return (double) tv.tv_usec / 1000 + tv.tv_sec * 1000;
+}
+
+volatile double lastButtonMticks = mticks();
+IRAM_ATTR void buttonPressed() {
+  auto currentMticks = mticks();
+  auto difference = currentMticks - lastButtonMticks;
+  lastButtonMticks = currentMticks;
+  if (difference <= 500) return;
   Serial.println("Switching Location...");
   if (locationIndex == 1) {
     locationIndex = 0;
   } else {
     locationIndex++;
   }
+  locationChanged = true;
 }
 
 void setup() {
@@ -123,6 +132,7 @@ void loop() {
   auto humidity = dht.readHumidity();
 
   if (isnan(temp) || isnan(humidity)) {
+    setLEDColor({red});
     Serial.println("Failed to read!");
     return;
   }
@@ -131,6 +141,17 @@ void loop() {
   time(&now);
   char curDate[sizeof "yyyy-MM-ddThh:mm:ssZ"];
   strftime(curDate, sizeof curDate, "%FT%TZ", gmtime(&now));
+
+  if (locationChanged) {
+    setLEDColor({red, green, blue});
+    delay(500);
+    setLEDColor({});
+    delay(500);
+    setLEDColor({red, green, blue});
+    delay(500);
+    setLEDColor({red, blue});
+    locationChanged = false;
+  }
 
   String body = "{";
   body += "\"date\":\"" + String(curDate) + "\"";
@@ -145,6 +166,8 @@ void loop() {
   Serial.print("Request: "); 
   Serial.println(body);
 
+  client.beginRequest();
+  client.sendHeader("Authorization", "Bearer " + serverToken);
   String errorMessage;
   switch (client.put(endpoint, contentType, body)) {
     case HTTP_SUCCESS: errorMessage = ""; break;
@@ -154,6 +177,7 @@ void loop() {
     case HTTP_ERROR_API: errorMessage = "HTTP Client API error!"; break;
     default: errorMessage = "Unknown error"; break;
   }
+  client.endRequest();
   if (!errorMessage.isEmpty()) {
     setLEDColor({red});
     Serial.println(errorMessage);

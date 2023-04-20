@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SensorServer.Models;
 using SensorServer.Repositories;
@@ -47,6 +48,7 @@ public class MeasurementsController: ControllerBase
     // [HttpGet]
     // [Route("statistics")]
     // TODO: Add method GetMeasurementStatistics
+    // Minimum required arguments: [FromQuery] string? location
 
     [HttpGet]
     [Route("min-temperature")]
@@ -77,6 +79,7 @@ public class MeasurementsController: ControllerBase
     }
     
     [HttpPut]
+    [Authorize]
     public Measurement PutMeasurement([FromBody] Measurement measurement)
     {
         return _measurementsRepository.Add(measurement);

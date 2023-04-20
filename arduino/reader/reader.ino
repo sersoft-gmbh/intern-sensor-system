@@ -70,6 +70,17 @@ void setupTime() {
   Serial.print(asctime(&timeinfo));
 }
 
+String httpErrorMessage(int status, bool isHTTPStatus) {
+  switch (status) {
+    case HTTP_SUCCESS: return "";
+    case HTTP_ERROR_CONNECTION_FAILED: return "Connection failed!";
+    case HTTP_ERROR_TIMED_OUT: return "Connection timed out!";
+    case HTTP_ERROR_INVALID_RESPONSE: return "Invalid response!";
+    case HTTP_ERROR_API: return "HTTP Client API error!";
+    default: return isHTTPStatus ? "" : "Unknown error";
+  }
+}
+
 void initLED(int pin) {
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
@@ -166,27 +177,30 @@ void loop() {
   Serial.print("Request: "); 
   Serial.println(body);
 
+
   client.beginRequest();
-  client.sendHeader("Authorization", "Bearer " + serverToken);
-  String errorMessage;
-  switch (client.put(endpoint, contentType, body)) {
-    case HTTP_SUCCESS: errorMessage = ""; break;
-    case HTTP_ERROR_CONNECTION_FAILED: errorMessage = "Connection failed!"; break;
-    case HTTP_ERROR_TIMED_OUT: errorMessage = "Connection timed out!"; break;
-    case HTTP_ERROR_INVALID_RESPONSE: errorMessage = "Invalid response!"; break;
-    case HTTP_ERROR_API: errorMessage = "HTTP Client API error!"; break;
-    default: errorMessage = "Unknown error"; break;
-  }
-  client.endRequest();
+  auto errorMessage = httpErrorMessage(client.put(endpoint), false);
   if (!errorMessage.isEmpty()) {
     setLEDColor({red});
     Serial.println(errorMessage);
     return;
   }
+  client.sendHeader("Authorization", "Bearer " + String(serverToken));
+  client.sendHeader("Content-Type", contentType);
+  client.sendHeader("Content-Length", body.length());
+  client.beginBody();
+  client.print(body);
+  client.endRequest();
 
   auto statusCode = client.responseStatusCode();
   Serial.print("Status code: ");
   Serial.println(statusCode);
+  errorMessage = httpErrorMessage(statusCode, true);
+  if (!errorMessage.isEmpty()) {
+    setLEDColor({red});
+    Serial.println(errorMessage);
+    return;
+  }
 
   if (statusCode < 200 || statusCode >= 300) {
     setLEDColor({red}); // red and green looks more green than yellow

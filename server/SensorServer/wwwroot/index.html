@@ -23,16 +23,20 @@
             </div>
             <div class="card-body">
                 <h5 class="card-title" id="current-location-name"></h5>
-                <div class="row">
+                <div class="row mb-5">
                     <div id="latest-container" class="col"></div>
                 </div>
                 <div class="row">
                     <div id="min-container" class="col"></div>
+                    <div id="median-container" class="col"></div>
                     <div id="max-container" class="col"></div>
                 </div>
+                <div class="row" id="averages-container"></div>
             </div>
         </div>
         
+        
+        <!-- TEMPLATES -->
         <template id="tmpl-latest">
             <h2>Latest</h2>
             <p>
@@ -41,16 +45,33 @@
             </p>
             <p>
                 <span id="latest-temperature-celsius"></span>
+                &nbsp;
+                (<span id="latest-heatIndex-Celsius"></span>)
+                &nbsp;/&nbsp;
+                <span id="latest-temperature-fahrenheit"></span>
                 &nbsp;/&nbsp;
                 <span id="latest-humidity-percent"></span>
             </p>
-            
         </template>
 
-        <template id="tmpl-min-max">
-            <h2><span id="min-max-header" class="capitalized"></span></h2>
-            <p><span id="min-max-temperature-celsius"></span> (<span id="min-max-temperature-date"></span>)</p>
-            <p><span id="min-max-humidity-percent"></span> (<span id="min-max-humidity-date"></span>)</p>
+        <template id="tmpl-statistics">
+            <h2 id="stats-header" class="capitalized"></h2>
+            <p><span id="stats-temperature-celsius"></span> (<span id="stats-heatIndex-celsius"></span>) (<span id="stats-temperature-date"></span>)</p>
+            <p><span id="stats-humidity-percent"></span> (<span id="stats-humidity-date"></span>)</p>
+        </template>
+        
+        <template id="tmpl-average-statistics">
+            <div class="col mt-3">
+                <h2>Average</h2>
+                <div class="row justify-content-center">
+                    <h5 class="col-auto">Temperature</h5>
+                    <p class="col-auto" id="avg-stats-temperature"></p>
+                </div>
+                <div class="row justify-content-center">
+                    <h5 class="col-auto">Humidity</h5>
+                    <p class="col-auto" id="avg-stats-humidity"></p>
+                </div>
+            </div>
         </template>
 
         <template id="tmpl-location-list">

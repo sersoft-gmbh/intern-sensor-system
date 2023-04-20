@@ -21,6 +21,13 @@
         unit: 'celsius',
         maximumSignificantDigits: 3
     });
+
+    const fahrenheitFormatter = new Intl.NumberFormat(undefined, {
+        style: 'unit',
+        unit: 'fahrenheit',
+        maximumSignificantDigits: 3
+    });
+    
     const percentageFormatter = new Intl.NumberFormat(undefined, { 
         style: 'percent',
         maximumSignificantDigits: 3
@@ -28,6 +35,35 @@
     
     let currentLocation = '';
 
+    /**
+     * @typedef Measurement
+     * @type {object}
+     * @property {number} id
+     * @property {string|Date} date
+     * @property {string} location
+     * @property {number} temperatureCelsius
+     * @property {number} temperatureFahrenheit
+     * @property {number} humidityPercent
+     * @property {number} heatIndexFahrenheit
+     * @property {number} heatIndexCelsius
+     */
+
+    /**
+     * @typedef MeasurementStatistics
+     * @type {object}
+     * @property {number} averageTemperatureCelsius
+     * @property {number} averageHumidityPercent
+     * @property {Measurement | null} minTemperature
+     * @property {Measurement | null} maxTemperature
+     * @property {Measurement | null} minHumidity
+     * @property {Measurement | null} maxHumidity
+     * @property {Measurement | null} medianTemperature
+     * @property {Measurement | null} medianHumidity
+     */
+    
+    /**
+     * @return Promise<string[]>
+     */
     async function fetchLocations() {
         const response = await fetch(buildUrl("/locations"));
         const locations = await response.json();
@@ -41,18 +77,25 @@
         return locations;
     }
 
+    /**
+     * @return Promise<Measurement>
+     */
     async function fetchLatestMeasurement() {
         let query = [];
         if (currentLocation.length > 0) {
             query.push({
                 name: 'location',
                 value: currentLocation
+                
             });
         }
         const response = await fetch(buildUrl("/measurements/latest", query));
         return await response.json();
     }
 
+    /**
+     * @return Promise<MeasurementStatistics>
+     */
     async function fetchMeasurementStatistics() {
         let query = [];
         if (currentLocation.length > 0) {
@@ -76,9 +119,11 @@
         const template = document.getElementById("tmpl-location-entry").content;
         locations.forEach(location => {
             const currentLocationContent = template.cloneNode(true);
-            const currentLocationElement = currentLocationContent.getElementById("location-name");
-            currentLocationElement.removeId();
-            currentLocationElement.innerText = location;
+            const currentLocationElement = currentLocationContent.fillElementWithId(
+                "location-name",
+                'string',
+                location);
+            
             if (location === currentLocation) {
                 currentLocationElement.classList.add("active");
             } else {
@@ -99,53 +144,95 @@
 
         const content = document.getElementById("tmpl-latest").content.cloneNode(true);
         
-        const dateElem = content.getElementById("latest-date");
-        dateElem.removeId();
-        dateElem.innerText = luxon.DateTime.fromISO(latestMeasurement.date).toLocaleString(luxon.DateTime.DATETIME_SHORT_WITH_SECONDS);
+        content.fillElementWithId(
+            'latest-date',
+            'date',
+            latestMeasurement.date);
+       
+        content.fillElementWithId(
+            'latest-heatIndex-Celsius',
+            'temperatureCelsius',
+            latestMeasurement.heatIndexCelsius);
         
-        const locationElm = content.getElementById("latest-location");
+        const locationElm = content.fillElementWithId(
+            'latest-location', 
+            'string', 
+            " at " + latestMeasurement.location);
         if (currentLocation.length >= 0) {
             locationElm.parentElement.removeChild(locationElm);
-        } else {
-            locationElm.removeId();
-            locationElm.innerText = " at " + latestMeasurement.location;
         }
+        
+        content.fillElementWithId(
+            'latest-temperature-celsius',
+            'temperatureCelsius',
+            latestMeasurement.temperatureCelsius);
+        
+        content.fillElementWithId(
+            'latest-humidity-percent',
+            'percentage',
+            latestMeasurement.humidityPercent);
 
-        const celsiusElem = content.getElementById("latest-temperature-celsius");
-        celsiusElem.removeId();
-        celsiusElem.innerText = celsiusFormatter.format(latestMeasurement.temperatureCelsius);
-
-        const humidityElm = content.getElementById("latest-humidity-percent");
-        humidityElm.removeId();
-        humidityElm.innerText = percentageFormatter.format(latestMeasurement.humidityPercent);
+        content.fillElementWithId(
+            'latest-temperature-fahrenheit',
+            'temperatureFahrenheit',
+            latestMeasurement.temperatureFahrenheit);
 
         return content;
     }
-
-    async function getMinMaxMeasurementElements() {
+ 
+    async function getStatisticsMeasurementElements() {
+        /**
+         * @param {Measurement | null} temperatureMeasurement
+         * @param {Measurement | null} humidityMeasurement
+         * @param {string} header
+         * @return {Node}
+         */
         function createElementForMeasurement(temperatureMeasurement, humidityMeasurement, header) {
-            const content = document.getElementById("tmpl-min-max").content.cloneNode(true);
+            const content = document.getElementById("tmpl-statistics").content.cloneNode(true);
 
-            const dateElemTemp = content.getElementById('min-max-temperature-date');
-            dateElemTemp.removeId();
-            dateElemTemp.innerText = luxon.DateTime.fromISO(temperatureMeasurement.date).toLocaleString(luxon.DateTime.DATETIME_SHORT_WITH_SECONDS);
+            content.fillElementWithId(
+                'stats-temperature-date',
+                'date',
+                temperatureMeasurement?.date);
 
-            const dateElemHum = content.getElementById('min-max-humidity-date');
-            dateElemHum.removeId();
-            dateElemHum.innerText = luxon.DateTime.fromISO(humidityMeasurement.date).toLocaleString(luxon.DateTime.DATETIME_SHORT_WITH_SECONDS);
+            content.fillElementWithId(
+                'stats-humidity-date',
+                'date',
+                humidityMeasurement?.date);
 
-            const headerElement = content.getElementById("min-max-header");
-            headerElement.removeId();
-            headerElement.innerText = header;
+            content.fillElementWithId(
+                'stats-header',
+                'string',
+                header);
             
-            const celsiusElem = content.getElementById('min-max-temperature-celsius');
-            celsiusElem.removeId();
-            celsiusElem.innerText = celsiusFormatter.format(temperatureMeasurement.temperatureCelsius);
+            content.fillElementWithId(
+                'stats-temperature-celsius',
+                'temperatureCelsius',
+                temperatureMeasurement?.temperatureCelsius);
+            
+            content.fillElementWithId(
+                'stats-humidity-percent',
+                'percentage',
+                humidityMeasurement?.humidityPercent);
 
-            const humidityElm = content.getElementById('min-max-humidity-percent');
-            humidityElm.removeId();
-            humidityElm.innerText = percentageFormatter.format(humidityMeasurement.humidityPercent);
-
+            content.fillElementWithId(
+                'stats-heatIndex-celsius', 
+                'temperatureCelsius',
+                temperatureMeasurement?.heatIndexCelsius);
+            
+            return content;
+        }
+        
+        function createAverageElement(header, average) {
+            const content = document.getElementById("tmpl-average-statistics").content.cloneNode(true);
+            content.fillElementWithId(
+                'avg-stats-temperature', 
+                'temperatureCelsius', 
+                statistics.averageTemperatureCelsius);
+            content.fillElementWithId(
+                'avg-stats-humidity',
+                'percentage',
+                statistics.averageHumidityPercent);
             return content;
         }
 
@@ -153,7 +240,9 @@
 
         return {
             min: createElementForMeasurement(statistics.minTemperature, statistics.minHumidity, "min"),
-            max: createElementForMeasurement(statistics.maxTemperature, statistics.maxHumidity, "max"),
+            max: createElementForMeasurement(statistics.maxTemperature, statistics.maxHumidity,  "max"),
+            median: createElementForMeasurement(statistics.medianTemperature, statistics.medianHumidity, "median"),
+            averages: createAverageElement(statistics.averageTemperatureCelsius),
         };
     }
     
@@ -165,12 +254,14 @@
     async function updateContents() {
         const newLatestContent = await getLatestMeasurementElement();
         document.getElementById("latest-container").replaceContent(newLatestContent);
-        const newMinMaxContent = await getMinMaxMeasurementElements();
-        document.getElementById("min-container").replaceContent(newMinMaxContent.min);
-        document.getElementById("max-container").replaceContent(newMinMaxContent.max);
+        const newStatsContent = await getStatisticsMeasurementElements();
+        document.getElementById("min-container").replaceContent(newStatsContent.min);
+        document.getElementById("max-container").replaceContent(newStatsContent.max);
+        document.getElementById("median-container").replaceContent(newStatsContent.median);
+        document.getElementById("averages-container").replaceContent(newStatsContent.averages);
     }
 
-    Element.prototype.replaceContent = function(newContent) {
+    Node.prototype.replaceContent = function(newContent) {
         while (this.firstChild) {
             this.removeChild(this.lastChild);
         }
@@ -179,6 +270,37 @@
     Node.prototype.removeId = function() {
         this.attributes.removeNamedItem("id");
     };
+    /**
+     * @param {string} id
+     * @param {'string'|'date'|'temperatureCelsius'|'percentage' |'temperatureFahrenheit'} valueType
+     * @param {string|number|Date} value
+     * @return {HTMLElement}
+     */
+    Node.prototype.fillElementWithId = function(id, valueType, value) {
+        const element = this.getElementById(id);
+        element.removeId();
+        switch (valueType) {
+            case 'string':
+                element.innerText = value;
+                break;
+            case 'date':
+                element.innerText = luxon.DateTime.fromISO(value).toLocaleString(luxon.DateTime.DATETIME_SHORT_WITH_SECONDS);
+                break;
+            case 'temperatureCelsius':
+                element.innerText = celsiusFormatter.format(value);
+                break;
+            case 'temperatureFahrenheit':
+                element.innerText = fahrenheitFormatter.format(value);
+                break;
+            case 'percentage':
+                element.innerText = percentageFormatter.format(value);
+                break;
+            default:
+                console.error('Unsupported value type', valueType);
+                break;
+        }
+        return element;
+    }
 
     await updateLocations();
     await updateContents();

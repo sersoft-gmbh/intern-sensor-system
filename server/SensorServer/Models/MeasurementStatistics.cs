@@ -1,8 +1,11 @@
+using SensorServer.Helpers;
+
 namespace SensorServer.Models;
 
 public class MeasurementStatistics
 {
     public double AverageTemperatureCelsius { get; init; }
+    public double AverageTemperatureFahrenheit => AverageTemperatureCelsius.ToFahrenheit();
     public double AverageHumidityPercent { get; init; }
     
     public Measurement? MinTemperature { get; init; }

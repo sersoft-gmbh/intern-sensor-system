@@ -54,6 +54,11 @@ public class MeasurementsRepository: DbContext
         return Measurements.Find(id);
     }
     
+    public Measurement? GetLatestMeasurement(string? location)
+    {
+        return FilteredMeasurements(location, null, null).OrderByDescending(m => m.Date).FirstOrDefault();
+    }
+    
     public MeasurementStatistics GetMeasurementStatistics(
         string? location = null, 
         DateTime? start = null, 
@@ -72,16 +77,6 @@ public class MeasurementsRepository: DbContext
             MedianTemperature = filtered.OrderBy(m => m.TemperatureCelsius).Skip(count / 2).FirstOrDefault(),
             MedianHumidity = filtered.OrderBy(m => m.HumidityPercent).Skip(count / 2).FirstOrDefault(),
         };
-    }
-
-    public Measurement? GetMaxMeasurementBy<TKey>(Expression<Func<Measurement, TKey>> keySelector, string? location)
-    {
-        return FilteredMeasurements(location, null, null).OrderByDescending(keySelector).FirstOrDefault();
-    }
-    
-    public Measurement? GetMinMeasurementBy<TKey>(Expression<Func<Measurement, TKey>> keySelector, string? location)
-    {
-        return FilteredMeasurements(location, null, null).OrderBy(keySelector).FirstOrDefault();
     }
 
     public Measurement Add(Measurement measurement)

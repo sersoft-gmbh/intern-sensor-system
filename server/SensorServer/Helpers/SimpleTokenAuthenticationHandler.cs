@@ -22,7 +22,7 @@ public class SimpleTokenAuthenticationHandler: AuthenticationHandler<SimpleToken
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         // Authorization: Bearer sdlfihjslkdfgih
-        if (!Request.Headers.Authorization.Any()) return Task.FromResult(AuthenticateResult.Fail("Unauthorized"));
+        if (!Request.Headers.Authorization.Any()) return Task.FromResult(AuthenticateResult.NoResult());
         var authHeader = Request.Headers.Authorization[0];
         if (authHeader == null || !authHeader.ToLower().StartsWith("bearer "))
             return Task.FromResult(AuthenticateResult.Fail("Unauthorized"));

@@ -53,7 +53,7 @@
         return await response.json();
     }
 
-    async function fetchMinMaxMeasurement(minOrMax, valueType) {
+    async function fetchMeasurementStatistics() {
         let query = [];
         if (currentLocation.length > 0) {
             query.push({
@@ -61,7 +61,7 @@
                 value: currentLocation
             });
         }
-        const response = await fetch(buildUrl("/measurements/" + minOrMax + "-" + valueType, query));
+        const response = await fetch(buildUrl("/measurements/statistics", query));
         return await response.json();
     }
     
@@ -122,47 +122,52 @@
         return content;
     }
 
-    async function getMinMaxMeasurementElement(minOrMax) {
-        const temperatureMeasurement = await fetchMinMaxMeasurement(minOrMax, "temperature");
-        const humidityMeasurement = await fetchMinMaxMeasurement(minOrMax, "humidity");
-       
-        const content = document.getElementById("tmpl-min-max").content.cloneNode(true);
+    async function getMinMaxMeasurementElements() {
+        function createElementForMeasurement(temperatureMeasurement, humidityMeasurement, header) {
+            const content = document.getElementById("tmpl-min-max").content.cloneNode(true);
 
-        const dateElemTemp = content.getElementById("min-max-temperature-date");
-        dateElemTemp.removeId();
-        dateElemTemp.innerText = luxon.DateTime.fromISO(temperatureMeasurement.date).toLocaleString(luxon.DateTime.DATETIME_SHORT_WITH_SECONDS);
+            const dateElemTemp = content.getElementById('min-max-temperature-date');
+            dateElemTemp.removeId();
+            dateElemTemp.innerText = luxon.DateTime.fromISO(temperatureMeasurement.date).toLocaleString(luxon.DateTime.DATETIME_SHORT_WITH_SECONDS);
 
-        const dateElemHum = content.getElementById("min-max-humidity-date");
-        dateElemHum.removeId();
-        dateElemHum.innerText = luxon.DateTime.fromISO(humidityMeasurement.date).toLocaleString(luxon.DateTime.DATETIME_SHORT_WITH_SECONDS);
+            const dateElemHum = content.getElementById('min-max-humidity-date');
+            dateElemHum.removeId();
+            dateElemHum.innerText = luxon.DateTime.fromISO(humidityMeasurement.date).toLocaleString(luxon.DateTime.DATETIME_SHORT_WITH_SECONDS);
 
-        const headerElement = content.getElementById("min-or-max");
-        headerElement.removeId();
-        headerElement.innerText = minOrMax;
-        
-        const celsiusElem = content.getElementById("min-max-temperature-celsius");
-        celsiusElem.removeId();
-        celsiusElem.innerText = celsiusFormatter.format(temperatureMeasurement.temperatureCelsius);
+            const headerElement = content.getElementById("min-max-header");
+            headerElement.removeId();
+            headerElement.innerText = header;
+            
+            const celsiusElem = content.getElementById('min-max-temperature-celsius');
+            celsiusElem.removeId();
+            celsiusElem.innerText = celsiusFormatter.format(temperatureMeasurement.temperatureCelsius);
 
-        const humidityElm = content.getElementById("min-max-humidity-percent");
-        humidityElm.removeId();
-        humidityElm.innerText = percentageFormatter.format(humidityMeasurement.humidityPercent);
-        
-        return content;        
+            const humidityElm = content.getElementById('min-max-humidity-percent');
+            humidityElm.removeId();
+            humidityElm.innerText = percentageFormatter.format(humidityMeasurement.humidityPercent);
+
+            return content;
+        }
+
+        const statistics = await fetchMeasurementStatistics();
+
+        return {
+            min: createElementForMeasurement(statistics.minTemperature, statistics.minHumidity, "min"),
+            max: createElementForMeasurement(statistics.maxTemperature, statistics.maxHumidity, "max"),
+        };
     }
     
     async function updateLocations() {
         const newLocationsListContent = await getLocationsList();
         document.getElementById("locations-container").replaceContent(newLocationsListContent);
     }
-    
+
     async function updateContents() {
         const newLatestContent = await getLatestMeasurementElement();
         document.getElementById("latest-container").replaceContent(newLatestContent);
-        const newMinContent = await getMinMaxMeasurementElement("min");
-        document.getElementById("min-container").replaceContent(newMinContent);
-        const newMaxContent = await getMinMaxMeasurementElement("max");
-        document.getElementById("max-container").replaceContent(newMaxContent);
+        const newMinMaxContent = await getMinMaxMeasurementElements();
+        document.getElementById("min-container").replaceContent(newMinMaxContent.min);
+        document.getElementById("max-container").replaceContent(newMinMaxContent.max);
     }
 
     Element.prototype.replaceContent = function(newContent) {

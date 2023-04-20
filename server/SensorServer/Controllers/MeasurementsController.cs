@@ -42,40 +42,14 @@ public class MeasurementsController: ControllerBase
     [Route("latest")]
     public ActionResult<Measurement> GetLatestMeasurement([FromQuery] string? location)
     {
-        return ActionResultFor(_measurementsRepository.GetMaxMeasurementBy(m => m.Date, location));
+        return ActionResultFor(_measurementsRepository.GetLatestMeasurement(location));
     }
-    
-    // [HttpGet]
-    // [Route("statistics")]
-    // TODO: Add method GetMeasurementStatistics
-    // Minimum required arguments: [FromQuery] string? location
 
     [HttpGet]
-    [Route("min-temperature")]
-    public ActionResult<Measurement> GetLowestTemperature([FromQuery] string? location)
+    [Route("statistics")]
+    public MeasurementStatistics GetMeasurementStatistics([FromQuery] string? location, [FromQuery] DateTime? start, [FromQuery] DateTime? stop)
     {
-        return ActionResultFor(_measurementsRepository.GetMinMeasurementBy(m => m.TemperatureCelsius, location));
-    }
-    
-    [HttpGet]
-    [Route("max-temperature")]
-    public ActionResult<Measurement> GetGreatestTemperature([FromQuery] string? location)
-    {
-        return ActionResultFor(_measurementsRepository.GetMaxMeasurementBy(m => m.TemperatureCelsius, location));
-    }
-    
-    [HttpGet]
-    [Route("min-humidity")]
-    public ActionResult<Measurement> GetLowestHumidity([FromQuery] string? location)
-    {
-        return ActionResultFor(_measurementsRepository.GetMinMeasurementBy(m => m.HumidityPercent, location));
-    }
-    
-    [HttpGet]
-    [Route("max-humidity")]
-    public ActionResult<Measurement> GetGreatestHumidity([FromQuery] string? location)
-    {
-        return ActionResultFor(_measurementsRepository.GetMaxMeasurementBy(m => m.HumidityPercent, location));
+        return _measurementsRepository.GetMeasurementStatistics(location, start, stop);
     }
     
     [HttpPut]

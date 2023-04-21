@@ -21,18 +21,10 @@
 
 #define READ_INTERVAL 1000
 
-enum Color { red, green, blue };
-
-const String endpoint = "/measurements";
-const String contentType = "application/json";
-
-const char *ntpServer = "pool.ntp.org";
-const long gmtOffset_sec = 0;
-const int daylightOffset_sec = 3600;
-
-const String locations[2] = {"Office Desk", "Test"};
+const String locations[3] = {"Office Desk", "Living Room", "Bedroom"};
 volatile int locationIndex = 0;
-volatile bool locationChanged = false;
+
+enum Color { red, green, blue };
 
 DHT dht(DHTPIN, DHT11);
 WiFiClientSecure wifi;
@@ -55,6 +47,9 @@ void connectWifi() {
 }
 
 void setupTime() {
+  const char *ntpServer = "pool.ntp.org";
+  const long gmtOffset_sec = 0;
+  const int daylightOffset_sec = 3600;
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
   time_t now = time(nullptr);
@@ -98,14 +93,16 @@ double mticks() {
     return (double) tv.tv_usec / 1000 + tv.tv_sec * 1000;
 }
 
+volatile bool locationChanged = false;
 volatile double lastButtonMticks = mticks();
 IRAM_ATTR void buttonPressed() {
   auto currentMticks = mticks();
   auto difference = currentMticks - lastButtonMticks;
   lastButtonMticks = currentMticks;
   if (difference <= 500) return;
+  const int locationsEndIndex = (sizeof(locations) / sizeof(String)) - 1;
   Serial.println("Switching Location...");
-  if (locationIndex == 1) {
+  if (locationIndex == locationsEndIndex) {
     locationIndex = 0;
   } else {
     locationIndex++;
@@ -177,16 +174,15 @@ void loop() {
   Serial.print("Request: "); 
   Serial.println(body);
 
-
   client.beginRequest();
-  auto errorMessage = httpErrorMessage(client.put(endpoint), false);
+  auto errorMessage = httpErrorMessage(client.put("/measurements"), false);
   if (!errorMessage.isEmpty()) {
     setLEDColor({red});
     Serial.println(errorMessage);
     return;
   }
   client.sendHeader("Authorization", "Bearer " + String(serverToken));
-  client.sendHeader("Content-Type", contentType);
+  client.sendHeader("Content-Type", "application/json");
   client.sendHeader("Content-Length", body.length());
   client.beginBody();
   client.print(body);

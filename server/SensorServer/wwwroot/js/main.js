@@ -333,14 +333,16 @@
         const newMeasurements = (await fetchMeasurements(125)).reverse();
         chart.options.scales.y.min = statistics.minTemperature?.temperatureCelsius;
         chart.options.scales.y.max = statistics.maxTemperature?.temperatureCelsius;
-        if (chart.data.datasets.length <= 0) {
+        if (newMeasurements.length <= 0) {
+            chart.data.datasets = [];
+        } else if (chart.data.datasets.length <= 0) {
             chart.data.datasets = [{
                 data: newMeasurements,
             }];
         } else {
             const existingData = chart.data.datasets[0].data;
-            while (!deepEqual(existingData[0], newMeasurements[0])) {
-                existingData.shift()
+            while (existingData.length > 0 && !deepEqual(existingData[0], newMeasurements[0])) {
+                existingData.shift();
             }
             let index = 0;
             while (index < Math.min(existingData.length, newMeasurements.length)) {

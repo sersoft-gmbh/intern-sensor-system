@@ -37,14 +37,26 @@ public class MeasurementsRepository : DbContext
     }
 
     public Measurement[] AllMeasurements(
+        SortDirection sortDirection,
         int count,
         int skip = 0,
         string? location = null,
         DateTime? start = null,
         DateTime? stop = null)
     {
-        return FilteredMeasurements(location, start, stop)
-            .OrderByDescending(m => m.Date)
+        var filtered = FilteredMeasurements(location, start, stop);
+        switch (sortDirection)
+        {
+            case SortDirection.Ascending:
+                filtered = filtered.OrderBy(m => m.Date);
+                break;
+            case SortDirection.Descending:
+                filtered = filtered.OrderByDescending(m => m.Date);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(sortDirection), sortDirection, null);
+        }
+        return filtered
             .Skip(skip)
             .Take(count)
             .ToArray();

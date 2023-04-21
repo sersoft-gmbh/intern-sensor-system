@@ -22,13 +22,20 @@ public class MeasurementsController : ControllerBase
 
     [HttpGet]
     public Measurement[] GetMeasurements(
+        [FromQuery] SortDirection? sortDirection,
         [FromQuery] int? count,
         [FromQuery] int? skip,
         [FromQuery] string? location,
         [FromQuery] DateTime? start,
         [FromQuery] DateTime? stop)
     {
-        return _measurementsRepository.AllMeasurements(count ?? 100, skip ?? 0, location, start, stop);
+        return _measurementsRepository.AllMeasurements(
+            sortDirection ?? SortDirection.Descending,
+            count ?? 100,
+            skip ?? 0,
+            location,
+            start,
+            stop);
     }
 
     [HttpGet]

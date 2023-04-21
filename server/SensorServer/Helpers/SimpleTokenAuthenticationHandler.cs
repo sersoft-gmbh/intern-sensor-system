@@ -10,10 +10,10 @@ public class SimpleTokenAuthenticationOptions : AuthenticationSchemeOptions
     public IReadOnlySet<string> AllowedTokens { get; set; } = new HashSet<string>();
 }
 
-public class SimpleTokenAuthenticationHandler: AuthenticationHandler<SimpleTokenAuthenticationOptions>
+public class SimpleTokenAuthenticationHandler : AuthenticationHandler<SimpleTokenAuthenticationOptions>
 {
     public SimpleTokenAuthenticationHandler(IOptionsMonitor<SimpleTokenAuthenticationOptions> options,
-        ILoggerFactory logger, 
+        ILoggerFactory logger,
         UrlEncoder encoder,
         ISystemClock clock) : base(options, logger, encoder, clock)
     {

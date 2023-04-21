@@ -10,10 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEntityFrameworkSqlite();
 builder.Services.AddDbContext<MeasurementsRepository>();
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy => policy.WithOrigins("*"));
-});
+builder.Services.AddCors(options => { options.AddDefaultPolicy(policy => policy.WithOrigins("*")); });
 
 builder.Services
     .AddAuthentication("Bearer")
@@ -24,7 +21,8 @@ builder.Services
     });
 
 builder.Services
-    .AddControllers(options => options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer())))
+    .AddControllers(options =>
+        options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer())))
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter()));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -52,7 +50,7 @@ builder.Services.AddSwaggerGen(option =>
                     Id = "Bearer"
                 }
             },
-            new string[]{}
+            new string[] { }
         }
     });
 });

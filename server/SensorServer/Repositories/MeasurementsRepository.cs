@@ -4,7 +4,7 @@ using SensorServer.Models;
 
 namespace SensorServer.Repositories;
 
-public class MeasurementsRepository: DbContext
+public class MeasurementsRepository : DbContext
 {
     private static bool _didLogConnectionString;
 
@@ -27,6 +27,7 @@ public class MeasurementsRepository: DbContext
             _logger.LogInformation("Using database connection string: {connectionString}", connectionString);
             _didLogConnectionString = true;
         }
+
         optionsBuilder.UseSqlite(connectionString);
     }
 
@@ -39,7 +40,7 @@ public class MeasurementsRepository: DbContext
         int count,
         int skip = 0,
         string? location = null,
-        DateTime? start = null, 
+        DateTime? start = null,
         DateTime? stop = null)
     {
         return FilteredMeasurements(location, start, stop)
@@ -53,15 +54,15 @@ public class MeasurementsRepository: DbContext
     {
         return Measurements.Find(id);
     }
-    
+
     public Measurement? GetLatestMeasurement(string? location)
     {
         return FilteredMeasurements(location, null, null).OrderByDescending(m => m.Date).FirstOrDefault();
     }
-    
+
     public MeasurementStatistics GetMeasurementStatistics(
-        string? location = null, 
-        DateTime? start = null, 
+        string? location = null,
+        DateTime? start = null,
         DateTime? stop = null)
     {
         var filtered = FilteredMeasurements(location, start, stop);
@@ -87,6 +88,7 @@ public class MeasurementsRepository: DbContext
     }
 
     #region Helpers
+
     private IQueryable<Measurement> FilteredMeasurements(string? location, DateTime? start, DateTime? stop)
     {
         IQueryable<Measurement> filtered = Measurements;
@@ -94,15 +96,19 @@ public class MeasurementsRepository: DbContext
         {
             filtered = filtered.Where(m => m.Location == location);
         }
+
         if (start != null)
         {
             filtered = filtered.Where(m => m.Date >= start);
         }
+
         if (stop != null)
         {
             filtered = filtered.Where(m => m.Date <= stop);
         }
+
         return filtered;
     }
+
     #endregion
 }

@@ -12,7 +12,7 @@ public static class HeatIndexCalculator
         var heatIndex = 0.5 * (fahrenheit + 61 + (fahrenheit - 68) * 1.2 + humidityPercent * 0.094);
 
         if (heatIndex <= 79) return heatIndex;
-        
+
         heatIndex = -42.379 + 2.04901523 * fahrenheit + 10.14333127 * humidityPercent +
                     -0.22475541 * fahrenheit * humidityPercent +
                     -0.00683783 * Math.Pow(fahrenheit, 2) +

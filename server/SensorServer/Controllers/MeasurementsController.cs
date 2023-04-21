@@ -7,7 +7,7 @@ namespace SensorServer.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class MeasurementsController: ControllerBase
+public class MeasurementsController : ControllerBase
 {
     private readonly MeasurementsRepository _measurementsRepository;
     private readonly ILogger<MeasurementsController> _logger;
@@ -30,7 +30,7 @@ public class MeasurementsController: ControllerBase
     {
         return _measurementsRepository.AllMeasurements(count ?? 100, skip ?? 0, location, start, stop);
     }
-    
+
     [HttpGet]
     [Route("{id:long}")]
     public ActionResult<Measurement> GetMeasurements([FromRoute] long id)
@@ -47,23 +47,26 @@ public class MeasurementsController: ControllerBase
 
     [HttpGet]
     [Route("statistics")]
-    public MeasurementStatistics GetMeasurementStatistics([FromQuery] string? location, [FromQuery] DateTime? start, [FromQuery] DateTime? stop)
+    public MeasurementStatistics GetMeasurementStatistics([FromQuery] string? location, [FromQuery] DateTime? start,
+        [FromQuery] DateTime? stop)
     {
         return _measurementsRepository.GetMeasurementStatistics(location, start, stop);
     }
-    
+
     [HttpPut]
     [Authorize]
     public Measurement PutMeasurement([FromBody] Measurement measurement)
     {
         return _measurementsRepository.Add(measurement);
     }
-    
+
     #region Helpers
+
     private ActionResult<Measurement> ActionResultFor(Measurement? measurement)
     {
         if (measurement == null) return NotFound();
         return measurement;
     }
+
     #endregion
 }

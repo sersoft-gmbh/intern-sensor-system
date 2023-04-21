@@ -1,8 +1,54 @@
 (async () => {
     'use strict'
-    
+
     const serverAddress = window.location;
-    
+
+    const chartElement = document.getElementById('temperature-chart');
+    const chart = new Chart(chartElement, {
+        type: 'line',
+        data: {
+            datasets: []
+        },
+        options: {
+            responsive: true,
+            datasets: {
+                line: {
+                    backgroundColor: 'green',
+                    borderColor: 'blue',
+                }
+            },
+            parsing: {
+                xAxisKey: 'date',
+                yAxisKey: 'temperatureCelsius'
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'minute'
+                    }
+                },
+                y: {
+                    type: 'linear'
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Taken as is from https://stackoverflow.com/a/32922084
+    function deepEqual(x, y) {
+        const ok = Object.keys, tx = typeof x, ty = typeof y;
+        return x && y && tx === 'object' && tx === ty ? (
+            ok(x).length === ok(y).length &&
+            ok(x).every(key => deepEqual(x[key], y[key]))
+        ) : (x === y);
+    }
+
     function buildUrl(path, query) {
         let url = new URL(serverAddress);
         url.pathname = path;
@@ -16,7 +62,7 @@
         return url;
     }
 
-    const celsiusFormatter = new Intl.NumberFormat(undefined, { 
+    const celsiusFormatter = new Intl.NumberFormat(undefined, {
         style: 'unit',
         unit: 'celsius',
         maximumSignificantDigits: 3
@@ -27,12 +73,12 @@
         unit: 'fahrenheit',
         maximumSignificantDigits: 3
     });
-    
-    const percentageFormatter = new Intl.NumberFormat(undefined, { 
+
+    const percentageFormatter = new Intl.NumberFormat(undefined, {
         style: 'percent',
         maximumSignificantDigits: 3
     });
-    
+
     let currentLocation = '';
 
     /**
@@ -60,7 +106,7 @@
      * @property {Measurement | null} medianTemperature
      * @property {Measurement | null} medianHumidity
      */
-    
+
     /**
      * @return Promise<string[]>
      */
@@ -78,6 +124,28 @@
     }
 
     /**
+     * @param {number | null} count
+     * @return Promise<Measurement[]>
+     */
+    async function fetchMeasurements(count = null) {
+        let query = [];
+        if (currentLocation.length > 0) {
+            query.push({
+                name: 'location',
+                value: currentLocation
+            });
+        }
+        if (count != null) {
+            query.push({
+                name: 'count',
+                value: count
+            });
+        }
+        const response = await fetch(buildUrl("/measurements", query));
+        return await response.json();
+    }
+
+    /**
      * @return Promise<Measurement>
      */
     async function fetchLatestMeasurement() {
@@ -86,7 +154,6 @@
             query.push({
                 name: 'location',
                 value: currentLocation
-                
             });
         }
         const response = await fetch(buildUrl("/measurements/latest", query));
@@ -107,7 +174,7 @@
         const response = await fetch(buildUrl("/measurements/statistics", query));
         return await response.json();
     }
-    
+
     async function getLocationsList() {
         const locations = await fetchLocations();
         locations.sort();
@@ -123,7 +190,7 @@
                 "location-name",
                 'string',
                 location);
-            
+
             if (location === currentLocation) {
                 currentLocationElement.classList.add("active");
             } else {
@@ -135,7 +202,7 @@
             }
             locationsList.appendChild(currentLocationContent);
         });
-        
+
         return locationsTemplate;
     }
 
@@ -143,30 +210,30 @@
         const latestMeasurement = await fetchLatestMeasurement();
 
         const content = document.getElementById("tmpl-latest").content.cloneNode(true);
-        
+
         content.fillElementWithId(
             'latest-date',
             'date',
             latestMeasurement.date);
-       
+
         content.fillElementWithId(
             'latest-heatIndex-Celsius',
             'temperatureCelsius',
             latestMeasurement.heatIndexCelsius);
-        
+
         const locationElm = content.fillElementWithId(
-            'latest-location', 
-            'string', 
+            'latest-location',
+            'string',
             " at " + latestMeasurement.location);
         if (currentLocation.length >= 0) {
             locationElm.parentElement.removeChild(locationElm);
         }
-        
+
         content.fillElementWithId(
             'latest-temperature-celsius',
             'temperatureCelsius',
             latestMeasurement.temperatureCelsius);
-        
+
         content.fillElementWithId(
             'latest-humidity-percent',
             'percentage',
@@ -179,8 +246,11 @@
 
         return content;
     }
- 
-    async function getStatisticsMeasurementElements() {
+
+    /**
+     * @param {MeasurementStatistics} statistics
+     */
+    async function getStatisticsMeasurementElements(statistics) {
         /**
          * @param {Measurement | null} temperatureMeasurement
          * @param {Measurement | null} humidityMeasurement
@@ -204,30 +274,30 @@
                 'stats-header',
                 'string',
                 header);
-            
+
             content.fillElementWithId(
                 'stats-temperature-celsius',
                 'temperatureCelsius',
                 temperatureMeasurement?.temperatureCelsius);
-            
+
             content.fillElementWithId(
                 'stats-humidity-percent',
                 'percentage',
                 humidityMeasurement?.humidityPercent);
 
             content.fillElementWithId(
-                'stats-heatIndex-celsius', 
+                'stats-heatIndex-celsius',
                 'temperatureCelsius',
                 temperatureMeasurement?.heatIndexCelsius);
-            
+
             return content;
         }
-        
-        function createAverageElement(header, average) {
+
+        function createAverageElement() {
             const content = document.getElementById("tmpl-average-statistics").content.cloneNode(true);
             content.fillElementWithId(
-                'avg-stats-temperature', 
-                'temperatureCelsius', 
+                'avg-stats-temperature',
+                'temperatureCelsius',
                 statistics.averageTemperatureCelsius);
             content.fillElementWithId(
                 'avg-stats-humidity',
@@ -236,16 +306,14 @@
             return content;
         }
 
-        const statistics = await fetchMeasurementStatistics();
-
         return {
             min: createElementForMeasurement(statistics.minTemperature, statistics.minHumidity, "min"),
-            max: createElementForMeasurement(statistics.maxTemperature, statistics.maxHumidity,  "max"),
+            max: createElementForMeasurement(statistics.maxTemperature, statistics.maxHumidity, "max"),
             median: createElementForMeasurement(statistics.medianTemperature, statistics.medianHumidity, "median"),
-            averages: createAverageElement(statistics.averageTemperatureCelsius),
+            averages: createAverageElement(),
         };
     }
-    
+
     async function updateLocations() {
         const newLocationsListContent = await getLocationsList();
         document.getElementById("locations-container").replaceContent(newLocationsListContent);
@@ -254,20 +322,53 @@
     async function updateContents() {
         const newLatestContent = await getLatestMeasurementElement();
         document.getElementById("latest-container").replaceContent(newLatestContent);
-        const newStatsContent = await getStatisticsMeasurementElements();
+
+        const statistics = await fetchMeasurementStatistics();
+        const newStatsContent = await getStatisticsMeasurementElements(statistics);
         document.getElementById("min-container").replaceContent(newStatsContent.min);
         document.getElementById("max-container").replaceContent(newStatsContent.max);
         document.getElementById("median-container").replaceContent(newStatsContent.median);
         document.getElementById("averages-container").replaceContent(newStatsContent.averages);
+
+        const newMeasurements = (await fetchMeasurements(125)).reverse();
+        chart.options.scales.y.min = statistics.minTemperature?.temperatureCelsius;
+        chart.options.scales.y.max = statistics.maxTemperature?.temperatureCelsius;
+        if (chart.data.datasets.length <= 0) {
+            chart.data.datasets = [{
+                data: newMeasurements,
+            }];
+        } else {
+            const existingData = chart.data.datasets[0].data;
+            while (!deepEqual(existingData[0], newMeasurements[0])) {
+                existingData.shift()
+            }
+            let index = 0;
+            while (index < Math.min(existingData.length, newMeasurements.length)) {
+                if (!deepEqual(existingData[index], newMeasurements[index])) {
+                    existingData.splice(index, 0, newMeasurements[index]);
+                }
+                index++;
+            }
+            while (index < newMeasurements.length) {
+                existingData.push(newMeasurements[index]);
+                index++;
+            }
+        }
+        chart.update();
+        if (newMeasurements.length > 0) {
+            chartElement.classList.remove('d-none');
+        } else {
+            chartElement.classList.add('d-none');
+        }
     }
 
-    Node.prototype.replaceContent = function(newContent) {
+    Node.prototype.replaceContent = function (newContent) {
         while (this.firstChild) {
             this.removeChild(this.lastChild);
         }
         this.appendChild(newContent);
     };
-    Node.prototype.removeId = function() {
+    Node.prototype.removeId = function () {
         this.attributes.removeNamedItem("id");
     };
     /**
@@ -276,7 +377,7 @@
      * @param {string|number|Date} value
      * @return {HTMLElement}
      */
-    Node.prototype.fillElementWithId = function(id, valueType, value) {
+    Node.prototype.fillElementWithId = function (id, valueType, value) {
         const element = this.getElementById(id);
         element.removeId();
         switch (valueType) {

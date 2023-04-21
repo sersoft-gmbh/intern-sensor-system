@@ -53,6 +53,13 @@ public class MeasurementsController : ControllerBase
     }
 
     [HttpGet]
+    [Route("counts")]
+    public MeasurementCounts GetMeasurementCounts([FromQuery] DateTime? start, [FromQuery] DateTime? stop)
+    {
+        return _measurementsRepository.GetMeasurementCounts(start, stop);
+    }
+
+    [HttpGet]
     [Route("statistics")]
     public MeasurementStatistics GetMeasurementStatistics([FromQuery] string? location, [FromQuery] DateTime? start,
         [FromQuery] DateTime? stop)

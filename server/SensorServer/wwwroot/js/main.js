@@ -3,9 +3,10 @@
 /**
  * @param {string[]} locations
  * @param {string | null} currentLocation
+ * @param {function} updateLocation
  * @return Promise<Node>
  */
-async function getLocationsListElement(locations, currentLocation) {
+async function getLocationsListElement(locations, currentLocation, updateLocation) {
     const locationsTemplate = document.getElementById("tmpl-location-list").content.cloneNode(true);
     const locationsList = locationsTemplate.getElementById("locations-list");
     locationsList.removeId();
@@ -22,7 +23,7 @@ async function getLocationsListElement(locations, currentLocation) {
             currentLocationElement.classList.add("active");
         } else {
             currentLocationElement.addEventListener('click', async () => {
-                currentLocation = location;
+                updateLocation(location);
                 await updateContents();
             })
         }
@@ -153,7 +154,9 @@ async function updateContents() {
         currentLocation = '';
     }
 
-    const newLocationsListContent = await getLocationsListElement(locations, currentLocation);
+    const newLocationsListContent = await getLocationsListElement(locations, currentLocation, location => {
+        currentLocation = location;
+    });
     document.getElementById("locations-container").replaceContent(newLocationsListContent);
 
     const newLatestContent = await getLatestMeasurementElement(currentLocation);

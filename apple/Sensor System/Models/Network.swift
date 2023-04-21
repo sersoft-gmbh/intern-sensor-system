@@ -80,7 +80,7 @@ struct Network {
 
     func measurements(ascending: Bool = false, count: Int? = nil, location: String? = nil) async throws -> Array<SensorsMeasurement> {
         var query: Array<URLQueryItem> = [
-//            URLQueryItem(name: "sortDirection", value: ascending ? "ascending" : "descending")
+            URLQueryItem(name: "sortDirection", value: ascending ? "ascending" : "descending")
         ]
         if let count {
             query.append(.init(name: "count", value: String(count)))
@@ -94,6 +94,10 @@ struct Network {
     func latestMeasurement(forLocation location: String? = nil) async throws -> SensorsMeasurement? {
         try await fetchReplacingNotFoundWithNil(.init(path: "measurements", "latest",
                                                       query: location.map { [.init(name: "location", value: $0)] }))
+    }
+
+    func counts() async throws -> SensorMeasurementCounts {
+        try await fetch(.init(path: "measurements", "counts"))
     }
 
     func statistics(forLocation location: String? = nil) async throws -> SensorsMeasurementStatistics {

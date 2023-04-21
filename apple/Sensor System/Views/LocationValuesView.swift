@@ -3,7 +3,7 @@ import SwiftUI
 struct LocationValuesView: View {
     var locations: Array<String>
 
-    @State
+    @AppStorage("SelectedValuesLocation")
     private var selectedLocation: String?
 
     @State
@@ -156,7 +156,7 @@ struct LocationValuesView: View {
             statistics = try await network.statistics(forLocation: selectedLocation)
         } catch is CancellationError {
         } catch {
-            print("Failed to fetch latest measurement: \(error)")
+            print("Failed to fetch measurement statistics: \(error)")
             statistics = nil
         }
     }

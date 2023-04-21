@@ -1,13 +1,13 @@
 import Foundation
 
 struct SensorsMeasurementStatistics: Sendable, Hashable, Codable {
-    private let averageTemperatureCelsius: Double
-//    let averageTemperatureFahrenheit: Double
-    var averageTemperature: Measurement<UnitTemperature> {
-        .init(value: averageTemperatureCelsius, unit: .celsius)
+    private let averageTemperatureCelsius: Double?
+//    let averageTemperatureFahrenheit: Double?
+    var averageTemperature: Measurement<UnitTemperature>? {
+        averageTemperatureCelsius.map { .init(value: $0, unit: .celsius) }
     }
     
-    let averageHumidityPercent: Double
+    let averageHumidityPercent: Double?
 
     let minTemperature: SensorsMeasurement?
     let maxTemperature: SensorsMeasurement?

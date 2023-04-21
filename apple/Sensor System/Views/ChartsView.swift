@@ -41,6 +41,7 @@ struct ChartsView: View {
                           y: .value("Temperature", measurement.temperature.value))
                 .foregroundStyle(by: .value("Location", measurement.location))
             }
+            .chartForegroundStyleScale(domain: locations)
         }
         .padding()
 #if os(macOS)

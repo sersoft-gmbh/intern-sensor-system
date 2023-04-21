@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     private enum Tab: Hashable {
-        case values, charts
+        case locations, values, charts
     }
 
     @State
@@ -16,6 +16,11 @@ struct ContentView: View {
     
     var body: some View {
         TabView(selection: $selectedTab) {
+            LocationsList(locations: locations)
+                .tabItem {
+                    Label("Locations", systemImage: "list.bullet")
+                }
+                .tag(Tab.locations)
             LocationValuesView(locations: locations)
                 .tabItem {
                     Label("Values", systemImage: "thermometer.medium")
@@ -45,7 +50,7 @@ struct ContentView: View {
 
     private func updateLocations() async {
         do {
-            locations = try await network.locations()
+            locations = try await network.locations().sorted()
         } catch is CancellationError {
             return
         } catch {

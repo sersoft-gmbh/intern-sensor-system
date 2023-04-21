@@ -14,7 +14,7 @@
             integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
             crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@^3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@^4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
     <script src="js/theme.js" type="text/javascript" charset="utf-8" defer></script>
     <script src="js/main.js" type="text/javascript" charset="utf-8" defer></script>
@@ -37,10 +37,14 @@
                 <div id="max-container" class="col"></div>
             </div>
             <div class="row" id="averages-container"></div>
-            <div class="row mt-4">
-                <canvas id="temperature-chart" class="d-none"></canvas>
+            <div class="row">
+                <canvas id="location-temperature-chart" class="mt-4 d-none"></canvas>
             </div>
         </div>
+    </div>
+
+    <div class="row">
+        <canvas id="locations-chart" class="mt-4 d-none"></canvas>
     </div>
 
 

@@ -3,20 +3,14 @@
 
     const serverAddress = window.location;
 
-    const chartElement = document.getElementById('temperature-chart');
-    const chart = new Chart(chartElement, {
+    const currentLocationChartElement = document.getElementById('location-temperature-chart');
+    const currentLocationChart = new Chart(currentLocationChartElement, {
         type: 'line',
         data: {
             datasets: []
         },
         options: {
             responsive: true,
-            datasets: {
-                line: {
-                    backgroundColor: 'green',
-                    borderColor: 'blue',
-                }
-            },
             parsing: {
                 xAxisKey: 'date',
                 yAxisKey: 'temperatureCelsius'
@@ -35,6 +29,40 @@
             plugins: {
                 legend: {
                     display: false
+                }
+            }
+        }
+    });
+
+    const locationsChartElement = document.getElementById('locations-chart');
+    const locationsChart = new Chart(locationsChartElement, {
+        type: 'line',
+        data: {
+            datasets: []
+        },
+        options: {
+            responsive: true,
+            parsing: {
+                xAxisKey: 'date',
+                yAxisKey: 'temperatureCelsius'
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'minute'
+                    }
+                },
+                y: {
+                    type: 'linear'
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true
+                },
+                colors: {
+                    forceOverride: true
                 }
             }
         }
@@ -124,22 +152,28 @@
     }
 
     /**
+     * @param {'ascending' | 'descending'} sortDirection
      * @param {number | null} count
      * @param {string | null} location
      * @return Promise<Measurement[]>
      */
-    async function fetchMeasurements(count = null, location = null) {
-        let query = [];
-        if (location?.length > 0) {
-            query.push({
-                name: 'location',
-                value: location
-            });
-        }
+    async function fetchMeasurements(sortDirection= 'ascending', count = null, location = null) {
+        let query = [
+            {
+                name: 'sortDirection',
+                value: sortDirection
+            }
+        ];
         if (count != null) {
             query.push({
                 name: 'count',
                 value: count
+            });
+        }
+        if (location && location.length > 0) {
+            query.push({
+                name: 'location',
+                value: location
             });
         }
         const response = await fetch(buildUrl("/measurements", query));
@@ -162,24 +196,26 @@
     }
 
     /**
+     * @param {string | null} location
      * @return Promise<MeasurementStatistics>
      */
-    async function fetchMeasurementStatistics() {
+    async function fetchMeasurementStatistics(location = null) {
         let query = [];
-        if (currentLocation.length > 0) {
+        if (location && location.length > 0) {
             query.push({
                 name: 'location',
-                value: currentLocation
+                value: location
             });
         }
         const response = await fetch(buildUrl("/measurements/statistics", query));
         return await response.json();
     }
 
-    async function getLocationsList() {
-        const locations = await fetchLocations();
-        locations.sort();
-
+    /**
+     * @param {string[]} locations
+     * @return Promise<Node>
+     */
+    async function getLocationsList(locations) {
         const locationsTemplate = document.getElementById("tmpl-location-list").content.cloneNode(true);
         const locationsList = locationsTemplate.getElementById("locations-list");
         locationsList.removeId();
@@ -197,7 +233,6 @@
             } else {
                 currentLocationElement.addEventListener('click', async () => {
                     currentLocation = location;
-                    await updateLocations();
                     await updateContents();
                 })
             }
@@ -315,54 +350,110 @@
         };
     }
 
-    async function updateLocations() {
-        const newLocationsListContent = await getLocationsList();
-        document.getElementById("locations-container").replaceContent(newLocationsListContent);
+    function updateChartDataSet(currentData, newData) {
+        while (currentData.length > 0 && !deepEqual(currentData[0], newData[0])) {
+            currentData.shift();
+        }
+        let index = 0;
+        while (index < Math.min(currentData.length, newData.length)) {
+            if (!deepEqual(currentData[index], newData[index])) {
+                currentData.splice(index, 0, newData[index]);
+            }
+            index++;
+        }
+        while (index < newData.length) {
+            currentData.push(newData[index]);
+            index++;
+        }
     }
 
     async function updateContents() {
+        const locations = await fetchLocations();
+        locations.sort();
+
+        const newLocationsListContent = await getLocationsList(locations);
+        document.getElementById("locations-container").replaceContent(newLocationsListContent);
+
         const newLatestContent = await getLatestMeasurementElement();
         document.getElementById("latest-container").replaceContent(newLatestContent);
 
-        const statistics = await fetchMeasurementStatistics();
+        const statistics = await fetchMeasurementStatistics(currentLocation);
         const newStatsContent = await getStatisticsMeasurementElements(statistics);
         document.getElementById("min-container").replaceContent(newStatsContent.min);
         document.getElementById("max-container").replaceContent(newStatsContent.max);
         document.getElementById("median-container").replaceContent(newStatsContent.median);
         document.getElementById("averages-container").replaceContent(newStatsContent.averages);
 
-        const newMeasurements = (await fetchMeasurements(125, currentLocation)).reverse();
-        chart.options.scales.y.min = statistics.minTemperature?.temperatureCelsius;
-        chart.options.scales.y.max = statistics.maxTemperature?.temperatureCelsius;
-        if (newMeasurements.length <= 0) {
-            chart.data.datasets = [];
-        } else if (chart.data.datasets.length <= 0) {
-            chart.data.datasets = [{
-                data: newMeasurements,
+        const chartMeasurementsCount = 125;
+        const chartMinMaxPaddingCelsius = 0.75;
+        const newMeasurementsForLocation = (await fetchMeasurements('descending', chartMeasurementsCount, currentLocation)).reverse();
+        const newTemperaturesForLocation = newMeasurementsForLocation.map(m => m.temperatureCelsius);
+        currentLocationChart.options.scales.y.min = Math.min(...newTemperaturesForLocation) - chartMinMaxPaddingCelsius;
+        currentLocationChart.options.scales.y.max = Math.max(...newTemperaturesForLocation) + chartMinMaxPaddingCelsius;
+        if (newMeasurementsForLocation.length <= 0) {
+            currentLocationChart.data.datasets = [];
+        } else if (currentLocationChart.data.datasets.length <= 0) {
+            currentLocationChart.data.datasets = [{
+                data: newMeasurementsForLocation,
             }];
         } else {
-            const existingData = chart.data.datasets[0].data;
-            while (existingData.length > 0 && !deepEqual(existingData[0], newMeasurements[0])) {
-                existingData.shift();
-            }
-            let index = 0;
-            while (index < Math.min(existingData.length, newMeasurements.length)) {
-                if (!deepEqual(existingData[index], newMeasurements[index])) {
-                    existingData.splice(index, 0, newMeasurements[index]);
-                }
-                index++;
-            }
-            while (index < newMeasurements.length) {
-                existingData.push(newMeasurements[index]);
-                index++;
-            }
+            updateChartDataSet(currentLocationChart.data.datasets[0].data, newMeasurementsForLocation);
         }
-        chart.update();
-        if (newMeasurements.length > 0) {
-            chartElement.classList.remove('d-none');
+        if (newMeasurementsForLocation.length > 0) {
+            currentLocationChartElement.classList.remove('d-none');
         } else {
-            chartElement.classList.add('d-none');
+            currentLocationChartElement.classList.add('d-none');
         }
+        currentLocationChart.update();
+
+        const newMeasurements = (await fetchMeasurements('descending', chartMeasurementsCount)).reverse();
+        let locationsInMeasurements = [];
+        for (const measurement of newMeasurements) {
+            if (locationsInMeasurements.indexOf(measurement.location) === -1)
+                locationsInMeasurements.push(measurement.location)
+        }
+        locationsInMeasurements.sort();
+        const newTemperatures = newMeasurements.map(m => m.temperatureCelsius);
+        locationsChart.options.scales.y.min = Math.min(...newTemperatures) - chartMinMaxPaddingCelsius;
+        locationsChart.options.scales.y.max = Math.max(...newTemperatures) + chartMinMaxPaddingCelsius;
+        if (newMeasurements.length <= 0) {
+            locationsChart.data.datasets = [];
+        } else if (locationsChart.data.datasets.length <= 0) {
+            for (const location of locationsInMeasurements) {
+                locationsChart.data.datasets.push({
+                    data: newMeasurements.filter(m => m.location === location),
+                    label: location,
+                });
+            }
+        } else {
+            for (let i = 0; i < locationsInMeasurements.length; i++) {
+                const location = locationsInMeasurements[i];
+                const locationMeasurements = newMeasurements.filter(m => m.location === location);
+                if (locationsChart.data.datasets.length <= i) {
+                    locationsChart.data.datasets.push({
+                        data: locationMeasurements,
+                        label: location,
+                    });
+                } else if (locationsChart.data.datasets[i].label === location) {
+                    updateChartDataSet(locationsChart.data.datasets[i].data, locationMeasurements);
+                } else {
+                    locationsChart.data.datasets.splice(i, 0, {
+                        data: locationMeasurements,
+                        label: location,
+                    });
+                }
+            }
+            if (locationsChart.data.datasets.length > locationsInMeasurements.length) {
+                const leftoverCount = locationsChart.data.datasets.length - locationsInMeasurements.length;
+                locationsChart.data.datasets.splice(locationsInMeasurements.length, leftoverCount)
+            }
+        }
+        if (newMeasurements.length > 0) {
+            locationsChartElement.classList.remove('d-none');
+        } else {
+            locationsChartElement.classList.add('d-none');
+        }
+        locationsChart.update();
     }
 
     Node.prototype.replaceContent = function (newContent) {
@@ -406,8 +497,6 @@
         return element;
     }
 
-    await updateLocations();
     await updateContents();
-    setInterval(updateLocations, 5000);
     setInterval(updateContents, 3000);
 })();

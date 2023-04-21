@@ -125,14 +125,15 @@
 
     /**
      * @param {number | null} count
+     * @param {string | null} location
      * @return Promise<Measurement[]>
      */
-    async function fetchMeasurements(count = null) {
+    async function fetchMeasurements(count = null, location = null) {
         let query = [];
-        if (currentLocation.length > 0) {
+        if (location?.length > 0) {
             query.push({
                 name: 'location',
-                value: currentLocation
+                value: location
             });
         }
         if (count != null) {
@@ -330,7 +331,7 @@
         document.getElementById("median-container").replaceContent(newStatsContent.median);
         document.getElementById("averages-container").replaceContent(newStatsContent.averages);
 
-        const newMeasurements = (await fetchMeasurements(125)).reverse();
+        const newMeasurements = (await fetchMeasurements(125, currentLocation)).reverse();
         chart.options.scales.y.min = statistics.minTemperature?.temperatureCelsius;
         chart.options.scales.y.max = statistics.maxTemperature?.temperatureCelsius;
         if (newMeasurements.length <= 0) {

@@ -1,0 +1,440 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0733089929F1043E00756F60 /* SensorSystemApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0733089829F1043E00756F60 /* SensorSystemApp.swift */; };
+		0733089B29F1043E00756F60 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0733089A29F1043E00756F60 /* ContentView.swift */; };
+		0733089D29F1043F00756F60 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0733089C29F1043F00756F60 /* Assets.xcassets */; };
+		073308A029F1043F00756F60 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0733089F29F1043F00756F60 /* Preview Assets.xcassets */; };
+		073308A829F1050400756F60 /* SensorsMeasurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308A729F1050400756F60 /* SensorsMeasurement.swift */; };
+		073308AA29F1054A00756F60 /* SensorsMeasurementStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308A929F1054A00756F60 /* SensorsMeasurementStatistics.swift */; };
+		073308AF29F1061100756F60 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308AE29F1061100756F60 /* Network.swift */; };
+		073308B229F198E900756F60 /* AveragesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308B129F198E900756F60 /* AveragesView.swift */; };
+		073308B529F1991200756F60 /* FormatStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308B429F1991200756F60 /* FormatStyles.swift */; };
+		073308B729F1994700756F60 /* ValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308B629F1994700756F60 /* ValueView.swift */; };
+		073308B929F19B1F00756F60 /* TemperaturesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308B829F19B1F00756F60 /* TemperaturesView.swift */; };
+		073308BB29F19C7600756F60 /* HumidityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308BA29F19C7600756F60 /* HumidityView.swift */; };
+		073308BD29F19D1200756F60 /* LatestMeasurementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308BC29F19D1200756F60 /* LatestMeasurementView.swift */; };
+		073308BF29F19D5A00756F60 /* ValuesGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308BE29F19D5A00756F60 /* ValuesGroupView.swift */; };
+		073308C129F19E8800756F60 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308C029F19E8800756F60 /* StatisticsView.swift */; };
+		073308C329F27C9D00756F60 /* LocationValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308C229F27C9D00756F60 /* LocationValuesView.swift */; };
+		073308C529F27D1200756F60 /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308C429F27D1200756F60 /* ChartsView.swift */; };
+		073308C729F27F2100756F60 /* Environment+Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308C629F27F2100756F60 /* Environment+Network.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0733089529F1043E00756F60 /* Sensor System.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sensor System.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0733089829F1043E00756F60 /* SensorSystemApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorSystemApp.swift; sourceTree = "<group>"; };
+		0733089A29F1043E00756F60 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0733089C29F1043F00756F60 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0733089F29F1043F00756F60 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		073308A729F1050400756F60 /* SensorsMeasurement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorsMeasurement.swift; sourceTree = "<group>"; };
+		073308A929F1054A00756F60 /* SensorsMeasurementStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorsMeasurementStatistics.swift; sourceTree = "<group>"; };
+		073308AE29F1061100756F60 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
+		073308B129F198E900756F60 /* AveragesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AveragesView.swift; sourceTree = "<group>"; };
+		073308B429F1991200756F60 /* FormatStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatStyles.swift; sourceTree = "<group>"; };
+		073308B629F1994700756F60 /* ValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueView.swift; sourceTree = "<group>"; };
+		073308B829F19B1F00756F60 /* TemperaturesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemperaturesView.swift; sourceTree = "<group>"; };
+		073308BA29F19C7600756F60 /* HumidityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HumidityView.swift; sourceTree = "<group>"; };
+		073308BC29F19D1200756F60 /* LatestMeasurementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatestMeasurementView.swift; sourceTree = "<group>"; };
+		073308BE29F19D5A00756F60 /* ValuesGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuesGroupView.swift; sourceTree = "<group>"; };
+		073308C029F19E8800756F60 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		073308C229F27C9D00756F60 /* LocationValuesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationValuesView.swift; sourceTree = "<group>"; };
+		073308C429F27D1200756F60 /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
+		073308C629F27F2100756F60 /* Environment+Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+Network.swift"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0733089229F1043E00756F60 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0733088C29F1043E00756F60 = {
+			isa = PBXGroup;
+			children = (
+				0733089729F1043E00756F60 /* Sensor System */,
+				0733089629F1043E00756F60 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0733089629F1043E00756F60 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0733089529F1043E00756F60 /* Sensor System.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0733089729F1043E00756F60 /* Sensor System */ = {
+			isa = PBXGroup;
+			children = (
+				073308B329F1990A00756F60 /* Helpers */,
+				073308A629F104FD00756F60 /* Models */,
+				073308B029F198BB00756F60 /* Views */,
+				0733089A29F1043E00756F60 /* ContentView.swift */,
+				0733089829F1043E00756F60 /* SensorSystemApp.swift */,
+				0733089C29F1043F00756F60 /* Assets.xcassets */,
+				0733089E29F1043F00756F60 /* Preview Content */,
+			);
+			path = "Sensor System";
+			sourceTree = "<group>";
+		};
+		0733089E29F1043F00756F60 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				0733089F29F1043F00756F60 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		073308A629F104FD00756F60 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				073308AC29F105FB00756F60 /* Network */,
+				073308AE29F1061100756F60 /* Network.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		073308AC29F105FB00756F60 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				073308A729F1050400756F60 /* SensorsMeasurement.swift */,
+				073308A929F1054A00756F60 /* SensorsMeasurementStatistics.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		073308B029F198BB00756F60 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				073308B129F198E900756F60 /* AveragesView.swift */,
+				073308C429F27D1200756F60 /* ChartsView.swift */,
+				073308BA29F19C7600756F60 /* HumidityView.swift */,
+				073308BC29F19D1200756F60 /* LatestMeasurementView.swift */,
+				073308C229F27C9D00756F60 /* LocationValuesView.swift */,
+				073308C029F19E8800756F60 /* StatisticsView.swift */,
+				073308B829F19B1F00756F60 /* TemperaturesView.swift */,
+				073308BE29F19D5A00756F60 /* ValuesGroupView.swift */,
+				073308B629F1994700756F60 /* ValueView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		073308B329F1990A00756F60 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				073308B429F1991200756F60 /* FormatStyles.swift */,
+				073308C629F27F2100756F60 /* Environment+Network.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0733089429F1043E00756F60 /* Sensor System */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 073308A329F1043F00756F60 /* Build configuration list for PBXNativeTarget "Sensor System" */;
+			buildPhases = (
+				0733089129F1043E00756F60 /* Sources */,
+				0733089229F1043E00756F60 /* Frameworks */,
+				0733089329F1043E00756F60 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Sensor System";
+			productName = "Sensor System";
+			productReference = 0733089529F1043E00756F60 /* Sensor System.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0733088D29F1043E00756F60 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					0733089429F1043E00756F60 = {
+						CreatedOnToolsVersion = 14.3;
+					};
+				};
+			};
+			buildConfigurationList = 0733089029F1043E00756F60 /* Build configuration list for PBXProject "Sensor System" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 0733088C29F1043E00756F60;
+			productRefGroup = 0733089629F1043E00756F60 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0733089429F1043E00756F60 /* Sensor System */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0733089329F1043E00756F60 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				073308A029F1043F00756F60 /* Preview Assets.xcassets in Resources */,
+				0733089D29F1043F00756F60 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0733089129F1043E00756F60 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				073308AF29F1061100756F60 /* Network.swift in Sources */,
+				073308C329F27C9D00756F60 /* LocationValuesView.swift in Sources */,
+				073308C529F27D1200756F60 /* ChartsView.swift in Sources */,
+				073308B929F19B1F00756F60 /* TemperaturesView.swift in Sources */,
+				0733089B29F1043E00756F60 /* ContentView.swift in Sources */,
+				073308B729F1994700756F60 /* ValueView.swift in Sources */,
+				073308BF29F19D5A00756F60 /* ValuesGroupView.swift in Sources */,
+				073308C129F19E8800756F60 /* StatisticsView.swift in Sources */,
+				073308B229F198E900756F60 /* AveragesView.swift in Sources */,
+				073308BD29F19D1200756F60 /* LatestMeasurementView.swift in Sources */,
+				0733089929F1043E00756F60 /* SensorSystemApp.swift in Sources */,
+				073308A829F1050400756F60 /* SensorsMeasurement.swift in Sources */,
+				073308BB29F19C7600756F60 /* HumidityView.swift in Sources */,
+				073308AA29F1054A00756F60 /* SensorsMeasurementStatistics.swift in Sources */,
+				073308C729F27F2100756F60 /* Environment+Network.swift in Sources */,
+				073308B529F1991200756F60 /* FormatStyles.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		073308A129F1043F00756F60 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = appletvos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TVOS_DEPLOYMENT_TARGET = 16.0;
+			};
+			name = Debug;
+		};
+		073308A229F1043F00756F60 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = appletvos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				TVOS_DEPLOYMENT_TARGET = 16.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		073308A429F1043F00756F60 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon";
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvos*]" = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Sensor System/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "de.sersoft.internship.Sensor-System";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+			};
+			name = Debug;
+		};
+		073308A529F1043F00756F60 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon";
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvos*]" = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Sensor System/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "de.sersoft.internship.Sensor-System";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0733089029F1043E00756F60 /* Build configuration list for PBXProject "Sensor System" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				073308A129F1043F00756F60 /* Debug */,
+				073308A229F1043F00756F60 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		073308A329F1043F00756F60 /* Build configuration list for PBXNativeTarget "Sensor System" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				073308A429F1043F00756F60 /* Debug */,
+				073308A529F1043F00756F60 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0733088D29F1043E00756F60 /* Project object */;
+}

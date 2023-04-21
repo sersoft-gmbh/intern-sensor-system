@@ -72,6 +72,19 @@ public class MeasurementsRepository : DbContext
         return FilteredMeasurements(location, null, null).OrderByDescending(m => m.Date).FirstOrDefault();
     }
 
+    public MeasurementCounts GetMeasurementCounts(DateTime? start = null, DateTime? stop = null)
+    {
+        var total = FilteredMeasurements(null, start, stop).Count();
+        var perLocation = FilteredMeasurements(null, start, stop)
+            .GroupBy(m => m.Location)
+            .ToDictionary(g => g.Key, g => g.Count());
+        return new MeasurementCounts
+        {
+            Total = total,
+            PerLocation = perLocation,
+        };
+    }
+
     public MeasurementStatistics GetMeasurementStatistics(
         string? location = null,
         DateTime? start = null,

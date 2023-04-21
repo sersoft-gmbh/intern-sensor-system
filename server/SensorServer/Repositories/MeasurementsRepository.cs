@@ -92,6 +92,7 @@ public class MeasurementsRepository : DbContext
     {
         var filtered = FilteredMeasurements(location, start, stop);
         var count = filtered.Count();
+        if (count == 0) return new MeasurementStatistics();
         return new MeasurementStatistics
         {
             AverageTemperatureCelsius = filtered.Average(m => m.TemperatureCelsius),

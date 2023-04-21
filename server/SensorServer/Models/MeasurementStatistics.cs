@@ -4,9 +4,9 @@ namespace SensorServer.Models;
 
 public class MeasurementStatistics
 {
-    public double AverageTemperatureCelsius { get; init; }
-    public double AverageTemperatureFahrenheit => AverageTemperatureCelsius.ToFahrenheit();
-    public double AverageHumidityPercent { get; init; }
+    public double? AverageTemperatureCelsius { get; init; }
+    public double? AverageTemperatureFahrenheit => AverageTemperatureCelsius?.ToFahrenheit();
+    public double? AverageHumidityPercent { get; init; }
 
     public Measurement? MinTemperature { get; init; }
     public Measurement? MaxTemperature { get; init; }

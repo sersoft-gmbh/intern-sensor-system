@@ -1,6 +1,6 @@
 import Foundation
 
-struct SensorsMeasurementStatistics: Sendable, Hashable, Codable {
+struct SensorMeasurementStatistics: Sendable, Hashable, Codable {
     private let averageTemperatureCelsius: Double?
 //    let averageTemperatureFahrenheit: Double?
     var averageTemperature: Measurement<UnitTemperature>? {
@@ -9,18 +9,18 @@ struct SensorsMeasurementStatistics: Sendable, Hashable, Codable {
     
     let averageHumidityPercent: Double?
 
-    let minTemperature: SensorsMeasurement?
-    let maxTemperature: SensorsMeasurement?
+    let minTemperature: SensorMeasurement?
+    let maxTemperature: SensorMeasurement?
 
-    let minHumidity: SensorsMeasurement?
-    let maxHumidity: SensorsMeasurement?
+    let minHumidity: SensorMeasurement?
+    let maxHumidity: SensorMeasurement?
 
-    let medianTemperature: SensorsMeasurement?
-    let medianHumidity: SensorsMeasurement?
+    let medianTemperature: SensorMeasurement?
+    let medianHumidity: SensorMeasurement?
 }
 
 #if DEBUG
-extension SensorsMeasurementStatistics {
+extension SensorMeasurementStatistics {
     static var preview: Self {
         .init(averageTemperatureCelsius: 21.8,
               averageHumidityPercent: 0.353,

@@ -78,7 +78,7 @@ struct Network {
         try await fetch(.init(path: "locations"))
     }
 
-    func measurements(ascending: Bool = false, count: Int? = nil, location: String? = nil) async throws -> Array<SensorsMeasurement> {
+    func measurements(ascending: Bool = false, count: Int? = nil, location: String? = nil) async throws -> Array<SensorMeasurement> {
         var query: Array<URLQueryItem> = [
             URLQueryItem(name: "sortDirection", value: ascending ? "ascending" : "descending")
         ]
@@ -91,7 +91,7 @@ struct Network {
         return try await fetch(.init(path: "measurements", query: query))
     }
 
-    func latestMeasurement(forLocation location: String? = nil) async throws -> SensorsMeasurement? {
+    func latestMeasurement(forLocation location: String? = nil) async throws -> SensorMeasurement? {
         try await fetchReplacingNotFoundWithNil(.init(path: "measurements", "latest",
                                                       query: location.map { [.init(name: "location", value: $0)] }))
     }
@@ -100,7 +100,7 @@ struct Network {
         try await fetch(.init(path: "measurements", "counts"))
     }
 
-    func statistics(forLocation location: String? = nil) async throws -> SensorsMeasurementStatistics {
+    func statistics(forLocation location: String? = nil) async throws -> SensorMeasurementStatistics {
         try await fetch(.init(path: "measurements", "statistics",
                               query: location.map { [.init(name: "location", value: $0)] }))
     }

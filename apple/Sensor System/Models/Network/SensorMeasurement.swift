@@ -1,6 +1,6 @@
 import Foundation
 
-struct SensorsMeasurement: Sendable, Hashable, Codable, Identifiable {
+struct SensorMeasurement: Sendable, Hashable, Codable, Identifiable {
     let id: Int
     let date: Date
     let location: String
@@ -23,7 +23,7 @@ struct SensorsMeasurement: Sendable, Hashable, Codable, Identifiable {
 }
 
 #if DEBUG
-extension SensorsMeasurement {
+extension SensorMeasurement {
     static var preview: Self {
         .init(id: 1,
               date: .now,

@@ -7,50 +7,56 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0716AC2B29F545E300522038 /* SensorMeasurementDisplayOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0716AC2A29F545E300522038 /* SensorMeasurementDisplayOptions.swift */; };
+		0716AC2D29F5486600522038 /* View+Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0716AC2C29F5486600522038 /* View+Timer.swift */; };
 		0733089929F1043E00756F60 /* SensorSystemApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0733089829F1043E00756F60 /* SensorSystemApp.swift */; };
 		0733089B29F1043E00756F60 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0733089A29F1043E00756F60 /* ContentView.swift */; };
 		0733089D29F1043F00756F60 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0733089C29F1043F00756F60 /* Assets.xcassets */; };
 		073308A029F1043F00756F60 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0733089F29F1043F00756F60 /* Preview Assets.xcassets */; };
-		073308A829F1050400756F60 /* SensorsMeasurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308A729F1050400756F60 /* SensorsMeasurement.swift */; };
-		073308AA29F1054A00756F60 /* SensorsMeasurementStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308A929F1054A00756F60 /* SensorsMeasurementStatistics.swift */; };
+		073308A829F1050400756F60 /* SensorMeasurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308A729F1050400756F60 /* SensorMeasurement.swift */; };
+		073308AA29F1054A00756F60 /* SensorMeasurementStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308A929F1054A00756F60 /* SensorMeasurementStatistics.swift */; };
 		073308AF29F1061100756F60 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308AE29F1061100756F60 /* Network.swift */; };
 		073308B229F198E900756F60 /* AveragesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308B129F198E900756F60 /* AveragesView.swift */; };
 		073308B529F1991200756F60 /* FormatStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308B429F1991200756F60 /* FormatStyles.swift */; };
-		073308B729F1994700756F60 /* ValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308B629F1994700756F60 /* ValueView.swift */; };
-		073308B929F19B1F00756F60 /* TemperaturesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308B829F19B1F00756F60 /* TemperaturesView.swift */; };
+		073308B929F19B1F00756F60 /* TemperatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308B829F19B1F00756F60 /* TemperatureView.swift */; };
 		073308BB29F19C7600756F60 /* HumidityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308BA29F19C7600756F60 /* HumidityView.swift */; };
 		073308BD29F19D1200756F60 /* LatestMeasurementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308BC29F19D1200756F60 /* LatestMeasurementView.swift */; };
-		073308BF29F19D5A00756F60 /* ValuesGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308BE29F19D5A00756F60 /* ValuesGroupView.swift */; };
+		073308BF29F19D5A00756F60 /* ValueBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308BE29F19D5A00756F60 /* ValueBox.swift */; };
 		073308C129F19E8800756F60 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308C029F19E8800756F60 /* StatisticsView.swift */; };
 		073308C329F27C9D00756F60 /* LocationValuesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308C229F27C9D00756F60 /* LocationValuesView.swift */; };
 		073308C529F27D1200756F60 /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308C429F27D1200756F60 /* ChartsView.swift */; };
 		073308C729F27F2100756F60 /* Environment+Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308C629F27F2100756F60 /* Environment+Network.swift */; };
 		073308C929F2CBE400756F60 /* LocationsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308C829F2CBE400756F60 /* LocationsList.swift */; };
-		073308CB29F2CC6A00756F60 /* SensorsMeasurementCounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308CA29F2CC6A00756F60 /* SensorsMeasurementCounts.swift */; };
+		073308CB29F2CC6A00756F60 /* SensorMeasurementCounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308CA29F2CC6A00756F60 /* SensorMeasurementCounts.swift */; };
+		075A4E1629F554FF00830693 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075A4E1529F554FF00830693 /* Location.swift */; };
+		075A4E1829F5616C00830693 /* MeasurementDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075A4E1729F5616C00830693 /* MeasurementDetailsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0716AC2A29F545E300522038 /* SensorMeasurementDisplayOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorMeasurementDisplayOptions.swift; sourceTree = "<group>"; };
+		0716AC2C29F5486600522038 /* View+Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Timer.swift"; sourceTree = "<group>"; };
 		0733089529F1043E00756F60 /* Sensor System.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sensor System.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0733089829F1043E00756F60 /* SensorSystemApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorSystemApp.swift; sourceTree = "<group>"; };
 		0733089A29F1043E00756F60 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0733089C29F1043F00756F60 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0733089F29F1043F00756F60 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		073308A729F1050400756F60 /* SensorsMeasurement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorsMeasurement.swift; sourceTree = "<group>"; };
-		073308A929F1054A00756F60 /* SensorsMeasurementStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorsMeasurementStatistics.swift; sourceTree = "<group>"; };
+		073308A729F1050400756F60 /* SensorMeasurement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorMeasurement.swift; sourceTree = "<group>"; };
+		073308A929F1054A00756F60 /* SensorMeasurementStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorMeasurementStatistics.swift; sourceTree = "<group>"; };
 		073308AE29F1061100756F60 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		073308B129F198E900756F60 /* AveragesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AveragesView.swift; sourceTree = "<group>"; };
 		073308B429F1991200756F60 /* FormatStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatStyles.swift; sourceTree = "<group>"; };
-		073308B629F1994700756F60 /* ValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueView.swift; sourceTree = "<group>"; };
-		073308B829F19B1F00756F60 /* TemperaturesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemperaturesView.swift; sourceTree = "<group>"; };
+		073308B829F19B1F00756F60 /* TemperatureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemperatureView.swift; sourceTree = "<group>"; };
 		073308BA29F19C7600756F60 /* HumidityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HumidityView.swift; sourceTree = "<group>"; };
 		073308BC29F19D1200756F60 /* LatestMeasurementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatestMeasurementView.swift; sourceTree = "<group>"; };
-		073308BE29F19D5A00756F60 /* ValuesGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuesGroupView.swift; sourceTree = "<group>"; };
+		073308BE29F19D5A00756F60 /* ValueBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueBox.swift; sourceTree = "<group>"; };
 		073308C029F19E8800756F60 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		073308C229F27C9D00756F60 /* LocationValuesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationValuesView.swift; sourceTree = "<group>"; };
 		073308C429F27D1200756F60 /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
 		073308C629F27F2100756F60 /* Environment+Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+Network.swift"; sourceTree = "<group>"; };
 		073308C829F2CBE400756F60 /* LocationsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationsList.swift; sourceTree = "<group>"; };
-		073308CA29F2CC6A00756F60 /* SensorsMeasurementCounts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorsMeasurementCounts.swift; sourceTree = "<group>"; };
+		073308CA29F2CC6A00756F60 /* SensorMeasurementCounts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorMeasurementCounts.swift; sourceTree = "<group>"; };
+		075A4E1529F554FF00830693 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		075A4E1729F5616C00830693 /* MeasurementDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasurementDetailsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,7 +112,9 @@
 			isa = PBXGroup;
 			children = (
 				073308AC29F105FB00756F60 /* Network */,
+				075A4E1529F554FF00830693 /* Location.swift */,
 				073308AE29F1061100756F60 /* Network.swift */,
+				0716AC2A29F545E300522038 /* SensorMeasurementDisplayOptions.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -114,9 +122,9 @@
 		073308AC29F105FB00756F60 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				073308A729F1050400756F60 /* SensorsMeasurement.swift */,
-				073308CA29F2CC6A00756F60 /* SensorsMeasurementCounts.swift */,
-				073308A929F1054A00756F60 /* SensorsMeasurementStatistics.swift */,
+				073308A729F1050400756F60 /* SensorMeasurement.swift */,
+				073308CA29F2CC6A00756F60 /* SensorMeasurementCounts.swift */,
+				073308A929F1054A00756F60 /* SensorMeasurementStatistics.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -130,10 +138,10 @@
 				073308BC29F19D1200756F60 /* LatestMeasurementView.swift */,
 				073308C829F2CBE400756F60 /* LocationsList.swift */,
 				073308C229F27C9D00756F60 /* LocationValuesView.swift */,
+				075A4E1729F5616C00830693 /* MeasurementDetailsView.swift */,
 				073308C029F19E8800756F60 /* StatisticsView.swift */,
-				073308B829F19B1F00756F60 /* TemperaturesView.swift */,
-				073308BE29F19D5A00756F60 /* ValuesGroupView.swift */,
-				073308B629F1994700756F60 /* ValueView.swift */,
+				073308B829F19B1F00756F60 /* TemperatureView.swift */,
+				073308BE29F19D5A00756F60 /* ValueBox.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -141,8 +149,9 @@
 		073308B329F1990A00756F60 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				073308B429F1991200756F60 /* FormatStyles.swift */,
 				073308C629F27F2100756F60 /* Environment+Network.swift */,
+				073308B429F1991200756F60 /* FormatStyles.swift */,
+				0716AC2C29F5486600522038 /* View+Timer.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -176,6 +185,7 @@
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1430;
+				ORGANIZATIONNAME = "ser.soft GmbH";
 				TargetAttributes = {
 					0733089429F1043E00756F60 = {
 						CreatedOnToolsVersion = 14.3;
@@ -219,19 +229,22 @@
 			files = (
 				073308AF29F1061100756F60 /* Network.swift in Sources */,
 				073308C329F27C9D00756F60 /* LocationValuesView.swift in Sources */,
+				075A4E1629F554FF00830693 /* Location.swift in Sources */,
 				073308C529F27D1200756F60 /* ChartsView.swift in Sources */,
-				073308B929F19B1F00756F60 /* TemperaturesView.swift in Sources */,
+				073308B929F19B1F00756F60 /* TemperatureView.swift in Sources */,
 				0733089B29F1043E00756F60 /* ContentView.swift in Sources */,
-				073308B729F1994700756F60 /* ValueView.swift in Sources */,
-				073308BF29F19D5A00756F60 /* ValuesGroupView.swift in Sources */,
+				073308BF29F19D5A00756F60 /* ValueBox.swift in Sources */,
+				0716AC2B29F545E300522038 /* SensorMeasurementDisplayOptions.swift in Sources */,
 				073308C129F19E8800756F60 /* StatisticsView.swift in Sources */,
+				0716AC2D29F5486600522038 /* View+Timer.swift in Sources */,
 				073308B229F198E900756F60 /* AveragesView.swift in Sources */,
 				073308BD29F19D1200756F60 /* LatestMeasurementView.swift in Sources */,
-				073308CB29F2CC6A00756F60 /* SensorsMeasurementCounts.swift in Sources */,
+				073308CB29F2CC6A00756F60 /* SensorMeasurementCounts.swift in Sources */,
 				0733089929F1043E00756F60 /* SensorSystemApp.swift in Sources */,
-				073308A829F1050400756F60 /* SensorsMeasurement.swift in Sources */,
+				075A4E1829F5616C00830693 /* MeasurementDetailsView.swift in Sources */,
+				073308A829F1050400756F60 /* SensorMeasurement.swift in Sources */,
 				073308BB29F19C7600756F60 /* HumidityView.swift in Sources */,
-				073308AA29F1054A00756F60 /* SensorsMeasurementStatistics.swift in Sources */,
+				073308AA29F1054A00756F60 /* SensorMeasurementStatistics.swift in Sources */,
 				073308C729F27F2100756F60 /* Environment+Network.swift in Sources */,
 				073308B529F1991200756F60 /* FormatStyles.swift in Sources */,
 				073308C929F2CBE400756F60 /* LocationsList.swift in Sources */,

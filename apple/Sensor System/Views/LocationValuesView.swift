@@ -2,30 +2,21 @@ import SwiftUI
 
 struct LocationValuesView: View {
     var locations: Array<String>
-
-    @AppStorage("SelectedValuesLocation")
-    private var selectedLocation: String?
+    var selectedLocationName: String?
 
     @State
-    private var latestMeasurement: SensorsMeasurement?
+    private var latestMeasurement: SensorMeasurement?
     @State
-    private var statistics: SensorsMeasurementStatistics?
+    private var statistics: SensorMeasurementStatistics?
 
     @Environment(\.network)
     private var network
 
-    private var locationsPicker: some View {
-        Picker("Location", selection: $selectedLocation) {
-            ForEach(locations, id: \.self) {
-                Text($0).tag(Optional($0))
-            }
-        }
-    }
-
     @ViewBuilder
     private var latestAndAverageViews: some View {
         if let latestMeasurement {
-            LatestMeasurementView(measurement: latestMeasurement)
+            LatestMeasurementView(measurement: latestMeasurement,
+                                  showLocation: selectedLocationName == nil)
                 .transition(.move(edge: .leading).combined(with: .opacity))
         }
         if let statistics {
@@ -69,6 +60,10 @@ struct LocationValuesView: View {
                         statisticsViews(for: statistics)
                     }
                 }
+#elseif os(tvOS)
+                HStack(alignment: .top, spacing: 13) {
+                    statisticsViews(for: statistics)
+                }
 #else
                 HStack(alignment: .top) {
                     statisticsViews(for: statistics)
@@ -81,14 +76,6 @@ struct LocationValuesView: View {
 
     var body: some View {
         VStack {
-            if locations.count > 1 {
-                locationsPicker
-#if os(iOS)
-                    .pickerStyle(.segmented)
-#endif
-                    .padding()
-                    .transition(.move(edge: .top).combined(with: .opacity))
-            }
 #if os(iOS)
             if UIDevice.current.userInterfaceIdiom == .pad {
                 Spacer()
@@ -104,34 +91,31 @@ struct LocationValuesView: View {
 #else
             Spacer()
             content
+#if !os(tvOS)
                 .padding()
+#endif
             Spacer()
 #endif
         }
 #if os(macOS)
-        .frame(minWidth: 1000, minHeight: 530)
+        .frame(minWidth: 1050, minHeight: 530)
 #endif
-        .animation(.default, value: selectedLocation)
+        .animation(.default, value: selectedLocationName)
         .animation(.default, value: latestMeasurement)
         .animation(.default, value: statistics)
-        .onChange(of: locations) {
-            if selectedLocation.map($0.contains) != true {
-                selectedLocation = $0.first
-            }
-        }
-        .task(id: selectedLocation) {
+        .periodicallyRefresh(frequency: .high) {
             await updateContents()
         }
-        .onReceive(Timer.publish(every: 5, on: .main, in: .default).autoconnect()) { _ in
-            Task {
-                await updateContents()
-            }
+        .task(id: selectedLocationName) {
+            await updateContents()
         }
     }
 
-    private func statisticsViews(for statistics: SensorsMeasurementStatistics) -> some View {
+    private func statisticsViews(for statistics: SensorMeasurementStatistics) -> some View {
         ForEach(StatisticsView.StatisticsKind.allCases, id: \.self) {
-            StatisticsView(statistics: statistics, kind: $0)
+            StatisticsView(statistics: statistics,
+                           kind: $0,
+                           showLocation: selectedLocationName == nil)
         }
     }
 
@@ -143,7 +127,7 @@ struct LocationValuesView: View {
 
     private func updateLatestMeasurement() async {
         do {
-            latestMeasurement = try await network.latestMeasurement(forLocation: selectedLocation)
+            latestMeasurement = try await network.latestMeasurement(forLocation: selectedLocationName)
         } catch is CancellationError {
         } catch {
             print("Failed to fetch latest measurement: \(error)")
@@ -153,7 +137,7 @@ struct LocationValuesView: View {
 
     private func updateStatistics() async {
         do {
-            statistics = try await network.statistics(forLocation: selectedLocation)
+            statistics = try await network.statistics(forLocation: selectedLocationName)
         } catch is CancellationError {
         } catch {
             print("Failed to fetch measurement statistics: \(error)")
@@ -165,7 +149,8 @@ struct LocationValuesView: View {
 #if DEBUG
 struct LocationValuesView_Previews: PreviewProvider {
     static var previews: some View {
-        LocationValuesView(locations: SensorsMeasurement.previewLocations)
+        LocationValuesView(locations: SensorMeasurement.previewLocations,
+                           selectedLocationName: nil)
     }
 }
 #endif

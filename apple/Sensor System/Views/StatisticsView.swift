@@ -5,10 +5,11 @@ struct StatisticsView: View {
         case min, median, max
     }
 
-    var statistics: SensorsMeasurementStatistics
+    var statistics: SensorMeasurementStatistics
     var kind: StatisticsKind
+    var showLocation: Bool
 
-    private var measurements: (temperature: SensorsMeasurement?, humidity: SensorsMeasurement?) {
+    private var measurements: (temperature: SensorMeasurement?, humidity: SensorMeasurement?) {
         switch kind {
         case .min: return (statistics.minTemperature, statistics.minHumidity)
         case .median: return (statistics.medianTemperature, statistics.medianHumidity)
@@ -24,19 +25,27 @@ struct StatisticsView: View {
         }
     }
 
+    private var displayOptions: SensorMeasurementDisplayOptions {
+        var options = SensorMeasurementDisplayOptions.showDate
+        if showLocation {
+            options.insert(.showLocation)
+        }
+        return options
+    }
+
     var body: some View {
         let (temperature, humidity) = measurements
         if temperature != nil || humidity != nil {
-            ValuesGroupView(titleKey) {
+            ValueBox(style: .group(spacing: 8), titleKey) {
                 if let temperature {
-                    TemperaturesView(measurement: temperature,
-                                     showDate: true,
-                                     showFeelsLike: false)
+                    TemperatureView(measurement: temperature,
+                                    displayOptions: displayOptions,
+                                    showFeelsLike: false)
                     .transition(.opacity)
                 }
                 if let humidity {
                     HumidityView(measurement: humidity,
-                                 showDate: true)
+                                 displayOptions: displayOptions)
                     .transition(.opacity)
                 }
             }
@@ -49,9 +58,9 @@ struct StatisticsView: View {
 #if DEBUG
 struct StatisticsView_Previews: PreviewProvider {
     static var previews: some View {
-        StatisticsView(statistics: .preview, kind: .min)
-        StatisticsView(statistics: .preview, kind: .median)
-        StatisticsView(statistics: .preview, kind: .max)
+        StatisticsView(statistics: .preview, kind: .min, showLocation: true)
+        StatisticsView(statistics: .preview, kind: .median, showLocation: true)
+        StatisticsView(statistics: .preview, kind: .max, showLocation: true)
     }
 }
 #endif

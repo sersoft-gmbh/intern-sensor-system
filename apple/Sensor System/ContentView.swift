@@ -1,62 +1,149 @@
 import SwiftUI
 
+fileprivate extension Location {
+#if os(macOS)
+    static var `default`: Location { .all }
+#else
+    static var `default`: Location? {
+        UIDevice.current.userInterfaceIdiom == .phone ? nil : .all
+    }
+#endif
+}
+
 struct ContentView: View {
-    private enum Tab: Hashable {
-        case locations, values, charts
+    private enum DetailTab: Hashable {
+        case values, charts
     }
 
     @State
-    private var selectedTab: Tab = .values
+    private var selectedTab = DetailTab.values
 
     @State
-    private var locations = Array<String>()
+    private var locations = [Location.all]
+    @State
+    private var selectedLocation = Location.default
+
+    @AppStorage("SelectedLocation")
+    private var selectedLocationName: String?
+
+#if os(tvOS)
+    @Namespace
+    private var listNamespace
+    @Namespace
+    private var detailsNamespace
+    @FocusState
+    private var listFocused: Bool
+#endif
 
     @Environment(\.network)
     private var network
+
+    private var content: some View {
+#if os(tvOS)
+        HStack(alignment: .top, spacing: 21) {
+            LocationsList(locations: $locations,
+                          selectedLocation: $selectedLocation)
+            .focusSection()
+            .focusScope(listNamespace)
+            .focused($listFocused)
+            
+            if let selectedLocation {
+                locationsDetails(for: selectedLocation)
+                    .focusSection()
+                    .focusScope(detailsNamespace)
+                    .onMoveCommand {
+                        switch $0 {
+                        case .up: listFocused = true
+                        case .left where selectedTab == .values:
+                            listFocused = true
+                        default: break
+                        }
+                    }
+            }
+        }
+#else
+        NavigationSplitView {
+            LocationsList(locations: $locations,
+                          selectedLocation: $selectedLocation)
+            .navigationTitle("Locations")
+            .navigationDestination(for: Location.self) {
+                locationsDetails(for: $0)
+            }
+            .navigationSplitViewColumnWidth(ideal: 280)
+        } detail: {
+#if os(macOS)
+            locationsDetails(for: selectedLocation)
+#else
+            if let selectedLocation {
+                locationsDetails(for: selectedLocation)
+            }
+#endif
+        }
+#endif
+    }
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            LocationsList(locations: locations)
-                .tabItem {
-                    Label("Locations", systemImage: "list.bullet")
-                }
-                .tag(Tab.locations)
-            LocationValuesView(locations: locations)
-                .tabItem {
-                    Label("Values", systemImage: "thermometer.medium")
-                }
-                .tag(Tab.values)
-            ChartsView(locations: locations)
-                .tabItem {
-                    Label("Charts", systemImage: "chart.xyaxis.line")
-                }
-                .tag(Tab.charts)
-        }
-#if os(macOS)
-        .padding(.top)
-#endif
+        content
         .animation(.default, value: locations)
         .animation(.default, value: selectedTab)
-        .task {
-            guard locations.isEmpty else { return }
-            await updateLocations()
+        .onChange(of: locations) {
+#if os(macOS)
+            if !$0.contains(selectedLocation) {
+                selectedLocation = .all
+            }
+#else
+            if selectedLocation.map($0.contains) != true {
+                selectedLocation = .default
+            }
+#endif
         }
-        .onReceive(Timer.publish(every: 5, on: .main, in: .default).autoconnect()) { _ in
-            Task {
-                await updateLocations()
+        .onChange(of: selectedLocationName) {
+            selectedLocation = $0.map(Location.named) ?? .default
+        }
+        .onChange(of: selectedLocation) {
+            switch $0 {
+#if !os(macOS)
+            case nil: selectedLocationName = nil
+#endif
+            case .all: selectedLocationName = nil
+            case .named(let name): selectedLocationName = name
+            }
+        }
+        .onAppear {
+            let _selectedLocationName: String?
+#if os(macOS)
+            _selectedLocationName = selectedLocation.locationName
+#else
+            _selectedLocationName = selectedLocation?.locationName
+#endif
+            if selectedLocationName != _selectedLocationName {
+                selectedLocation = selectedLocationName.map(Location.named) ?? .default
             }
         }
     }
 
-    private func updateLocations() async {
-        do {
-            locations = try await network.locations().sorted()
-        } catch is CancellationError {
-            return
-        } catch {
-            print("Failed to fetch locations: \(error)")
-            locations.removeAll()
+    private func locationsDetails(for location: Location) -> some View {
+        TabView(selection: $selectedTab) {
+            let locationNames = locations.compactMap(\.locationName)
+            LocationValuesView(locations: locationNames,
+                               selectedLocationName: location.locationName)
+            .tabItem {
+                Label("Values", systemImage: "thermometer.medium")
+            }
+            .tag(DetailTab.values)
+            ChartsView(locations: locationNames,
+                       selectedLocationName: location.locationName)
+            .tabItem {
+                Label("Charts", systemImage: "chart.xyaxis.line")
+            }
+            .tag(DetailTab.charts)
         }
+#if os(macOS)
+        .padding(.top)
+#elseif os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+#endif
+        .navigationTitle(location.title)
     }
 }
 

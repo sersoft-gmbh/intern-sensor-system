@@ -31,7 +31,7 @@ private struct TimedView: ViewModifier {
             .task(id: refreshTimer.lastRefresh) {
                 if isInitialRefresh {
                     isInitialRefresh = false
-                    guard !callInitially else { return }
+                    guard callInitially else { return }
                 }
                 await action()
             }

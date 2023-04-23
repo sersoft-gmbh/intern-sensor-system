@@ -81,6 +81,7 @@ struct LocationsList: View {
 #if !os(tvOS)
                 .padding()
 #endif
+                .transition(.move(edge: .bottom))
             }
         }
 #if os(macOS)
@@ -133,6 +134,7 @@ struct LocationsList: View {
                     }
                 }
                 .font(.callout)
+                .transition(.move(edge: .trailing).combined(with: .opacity))
             }
         }
     }

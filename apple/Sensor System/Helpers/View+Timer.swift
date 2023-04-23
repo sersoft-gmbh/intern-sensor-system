@@ -20,11 +20,19 @@ private struct TimedView: ViewModifier {
     @StateObject
     fileprivate var refreshTimer: TimedObject
 
+    @State
+    private var isInitialRefresh = true
+
+    fileprivate let callInitially: Bool
     fileprivate let action: () async -> ()
 
     func body(content: Content) -> some View {
         content
             .task(id: refreshTimer.lastRefresh) {
+                if isInitialRefresh {
+                    isInitialRefresh = false
+                    guard !callInitially else { return }
+                }
                 await action()
             }
     }
@@ -41,14 +49,17 @@ fileprivate extension Duration {
 extension View {
     func every(_ timeInterval: TimeInterval,
                tolerance: TimeInterval? = nil,
+               callInitially: Bool = true,
                perform work: @escaping () async -> ()) -> some View {
         modifier(TimedView(refreshTimer: .init(timeInterval: timeInterval,
                                                tolerance: tolerance),
+                           callInitially: callInitially,
                            action: work))
     }
 
     func every(_ duration: Duration,
                tolerance: Duration? = nil,
+               callInitially: Bool = true,
                perform work: @escaping () async -> ()) -> some View {
         every(duration.timeInterval, tolerance: tolerance?.timeInterval, perform: work)
     }
@@ -67,6 +78,7 @@ enum PeriodicRefreshFrequency: Sendable, Hashable {
 
 extension View {
     func periodicallyRefresh(frequency: PeriodicRefreshFrequency = .high,
+                             callInitially: Bool = true,
                              byExecuting work: @escaping () async -> ()) -> some View {
         let timerValues = frequency.timerValues
         return every(timerValues.interval, tolerance: timerValues.tolerance, perform: work)

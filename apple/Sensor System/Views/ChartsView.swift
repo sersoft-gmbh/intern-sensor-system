@@ -111,7 +111,7 @@ struct ChartsView: View {
 #endif
         .animation(.default, value: measurements)
         .animation(.default, value: selectedLocationName)
-        .periodicallyRefresh {
+        .periodicallyRefresh(frequency: .high, callInitially: false) {
             await loadMeasurements()
         }
         .task(id: selectedLocationName) {

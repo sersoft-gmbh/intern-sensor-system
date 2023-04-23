@@ -103,7 +103,7 @@ struct LocationValuesView: View {
         .animation(.default, value: selectedLocationName)
         .animation(.default, value: latestMeasurement)
         .animation(.default, value: statistics)
-        .periodicallyRefresh(frequency: .high) {
+        .periodicallyRefresh(frequency: .high, callInitially: false) {
             await updateContents()
         }
         .task(id: selectedLocationName) {
@@ -127,7 +127,14 @@ struct LocationValuesView: View {
 
     private func updateLatestMeasurement() async {
         do {
-            latestMeasurement = try await network.latestMeasurement(forLocation: selectedLocationName)
+            let latest = try await network.latestMeasurement(forLocation: selectedLocationName)
+            if latestMeasurement == nil {
+                withAnimation(nil) {
+                    latestMeasurement = latest
+                }
+            } else {
+                latestMeasurement = latest
+            }
         } catch is CancellationError {
         } catch {
             print("Failed to fetch latest measurement: \(error)")
@@ -137,7 +144,14 @@ struct LocationValuesView: View {
 
     private func updateStatistics() async {
         do {
-            statistics = try await network.statistics(forLocation: selectedLocationName)
+            let stats = try await network.statistics(forLocation: selectedLocationName)
+            if statistics == nil {
+                withAnimation(nil) {
+                    statistics = stats
+                }
+            } else {
+                statistics = stats
+            }
         } catch is CancellationError {
         } catch {
             print("Failed to fetch measurement statistics: \(error)")

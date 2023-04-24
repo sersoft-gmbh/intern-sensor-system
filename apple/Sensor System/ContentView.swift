@@ -46,7 +46,7 @@ struct ContentView: View {
             .focusSection()
             .focusScope(listNamespace)
             .focused($listFocused)
-            
+
             if let selectedLocation {
                 locationsDetails(for: selectedLocation)
                     .focusSection()
@@ -58,6 +58,9 @@ struct ContentView: View {
                             listFocused = true
                         default: break
                         }
+                    }
+                    .onExitCommand {
+                        listFocused = true
                     }
             }
         }

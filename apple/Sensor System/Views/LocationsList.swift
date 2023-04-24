@@ -2,7 +2,7 @@ import SwiftUI
 import Charts
 
 fileprivate extension ScaleType {
-    static var _counts: Self {
+    static var counts: Self {
         if #available(iOS 16.4, tvOS 16.4, macOS 13.3, *) {
             return .symmetricLog
         } else {
@@ -51,7 +51,7 @@ struct LocationsList: View {
     @Environment(\.network)
     private var network
 
-    var body: some View {
+    private var list: some View {
         List(locations, selection: $selectedLocation) { location in
 #if os(tvOS)
             label(for: location)
@@ -67,56 +67,79 @@ struct LocationsList: View {
             }
 #endif
         }
-        .safeAreaInset(edge: .bottom) {
-            if let counts, showChart {
-                Chart(Array(counts.perLocation).sorted(using: KeyPathComparator(\.value)), id: \.key) {
-                    BarMark(x: .value("Location", $0.key),
-                            y: .value("Count", $0.value))
-                    .foregroundStyle(by: .value("Location", $0.key))
-                }
-                .chartForegroundStyleScale(domain: counts.perLocation.keys.sorted())
-                .chartXAxis(.hidden)
-                .chartYScale(type: ._counts)
-                .frame(maxHeight: 275)
-#if !os(tvOS)
-                .padding()
-#endif
-                .transition(.move(edge: .bottom))
+    }
+
+    @ViewBuilder
+    private var countCharts: some View {
+        if let counts, showChart {
+            Chart(Array(counts.perLocation).sorted(using: KeyPathComparator(\.value)), id: \.key) {
+                BarMark(x: .value("Location", $0.key),
+                        y: .value("Count", $0.value))
+                .foregroundStyle(by: .value("Location", $0.key))
             }
-        }
-#if os(macOS)
-        .frame(minWidth: 260)
-#elseif os(tvOS)
-        .frame(width: 400)
+            .chartForegroundStyleScale(domain: counts.perLocation.keys.sorted())
+            .chartXAxis(.hidden)
+            .chartYScale(type: .counts)
+            .frame(maxHeight: 275)
+#if !os(tvOS)
+            .padding()
 #endif
-        .animation(.default, value: counts)
-        .animation(.default, value: locations)
+#if os(iOS)
+            .background(Color(uiColor: .systemGroupedBackground))
+#endif
+            .transition(.move(edge: .bottom))
+        }
+    }
+
+    private var content: some View {
 #if os(tvOS)
-        .focused($isFocused)
-        .defaultFocus($focusedLocation, selectedLocation)
-        .onChange(of: isFocused) {
-            guard $0 else { return }
-            focusedLocation = selectedLocation
+        VStack {
+            list
+            countCharts
         }
-        .onChange(of: focusedLocation) {
-            guard $0 != nil else { return }
-            selectedLocation = $0
-        }
-        .onChange(of: selectedLocation) {
-            focusedLocation = $0
-        }
+#else
+        list
+            .safeAreaInset(edge: .bottom) {
+                countCharts
+            }
 #endif
-        .refreshable {
-            async let locations: Void = updateLocations()
-            async let counts: Void = updateCounts()
-            _ = await (locations, counts)
-        }
-        .periodicallyRefresh(frequency: .low) {
-            await updateLocations()
-        }
-        .periodicallyRefresh(frequency: .high) {
-            await updateCounts()
-        }
+    }
+
+    var body: some View {
+        content
+#if os(macOS)
+            .frame(minWidth: 260)
+#elseif os(tvOS)
+            .frame(width: 400)
+#endif
+            .animation(.default, value: counts)
+            .animation(.default, value: locations)
+#if os(tvOS)
+            .focused($isFocused)
+            .defaultFocus($focusedLocation, selectedLocation)
+            .onChange(of: isFocused) {
+                guard $0 else { return }
+                focusedLocation = selectedLocation
+            }
+            .onChange(of: focusedLocation) {
+                guard $0 != nil else { return }
+                selectedLocation = $0
+            }
+            .onChange(of: selectedLocation) {
+                focusedLocation = $0
+            }
+#endif
+            .refreshable {
+                async let locations: Void = updateLocations()
+                async let counts: Void = updateCounts()
+                _ = await (locations, counts)
+            }
+            .periodicallyRefresh(frequency: .low) {
+                await updateLocations()
+            }
+            .periodicallyRefresh(frequency: .high) {
+                await updateCounts()
+            }
     }
 
     private func label(for location: Location) -> some View {
@@ -166,7 +189,7 @@ struct LocationsList: View {
             if locations.isEmpty {
                 locations.append(.all)
             }
-            locations[1...] = try await network.locations().sorted().map(Location.named)[...]
+            locations[1...] = try await network.locations().sorted().lazy.map(Location.named)[...]
         } catch is CancellationError {
         } catch {
             print("Failed to fetch locations: \(error)")

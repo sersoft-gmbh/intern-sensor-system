@@ -59,19 +59,19 @@ async function fetchMeasurements(sortDirection= 'ascending', count = null, locat
     let query = [
         {
             name: 'sortDirection',
-            value: sortDirection
-        }
+            value: sortDirection,
+        },
     ];
     if (count != null) {
         query.push({
             name: 'count',
-            value: count
+            value: count,
         });
     }
     if (location && location.length > 0) {
         query.push({
             name: 'location',
-            value: location
+            value: location,
         });
     }
     const response = await fetch(buildUrl("/measurements", query));
@@ -87,7 +87,7 @@ async function fetchLatestMeasurement(location = null) {
     if (location && location.length > 0) {
         query.push({
             name: 'location',
-            value: location
+            value: location,
         });
     }
     const response = await fetch(buildUrl("/measurements/latest", query));
@@ -103,7 +103,7 @@ async function fetchMeasurementStatistics(location = null) {
     if (location && location.length > 0) {
         query.push({
             name: 'location',
-            value: location
+            value: location,
         });
     }
     const response = await fetch(buildUrl("/measurements/statistics", query));

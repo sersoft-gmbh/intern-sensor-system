@@ -8,17 +8,17 @@ namespace SensorServer.Controllers;
 public class LocationsController : ControllerBase
 {
     private readonly MeasurementsRepository _measurementsRepository;
-    private readonly ILogger<MeasurementsController> _logger;
+    private readonly ILogger<LocationsController> _logger;
 
-    public LocationsController(MeasurementsRepository measurementsRepository, ILogger<MeasurementsController> logger)
+    public LocationsController(MeasurementsRepository measurementsRepository, ILogger<LocationsController> logger)
     {
         _measurementsRepository = measurementsRepository;
         _logger = logger;
     }
 
     [HttpGet]
-    public string[] GetLocations()
+    public async Task<string[]> GetLocations()
     {
-        return _measurementsRepository.AllLocations();
+        return await _measurementsRepository.AllLocations();
     }
 }

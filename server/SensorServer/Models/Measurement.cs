@@ -1,7 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using SensorServer.Helpers;
 
 namespace SensorServer.Models;
 
+[Index(nameof(Date))]
+[Index(nameof(Location))]
 public class Measurement
 {
     public long? Id { get; set; }

@@ -2,6 +2,6 @@ namespace SensorServer.Models;
 
 public class MeasurementCounts
 {
-    public int Total { get; init; }
-    public Dictionary<string, int> PerLocation { get; init; } = new();
+    public long Total { get; init; }
+    public Dictionary<string, long> PerLocation { get; init; } = new();
 }

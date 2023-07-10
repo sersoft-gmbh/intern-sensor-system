@@ -37,7 +37,7 @@ builder.Services.AddSwaggerGen(option =>
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
         BearerFormat = "Custom",
-        Scheme = "Bearer"
+        Scheme = "Bearer",
     });
     option.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -47,11 +47,11 @@ builder.Services.AddSwaggerGen(option =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                    Id = "Bearer",
+                },
             },
             new string[] { }
-        }
+        },
     });
 });
 
@@ -69,6 +69,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseHttpLogging();
 app.UseFileServer();
 app.UseCors();
 app.UseAuthentication();

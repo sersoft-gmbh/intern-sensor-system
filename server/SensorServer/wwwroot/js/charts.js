@@ -12,75 +12,75 @@ const currentLocationChartElement = document.getElementById('location-temperatur
 const currentLocationChart = new Chart(currentLocationChartElement, {
     type: 'line',
     data: {
-        datasets: []
+        datasets: [],
     },
     options: {
         responsive: true,
         parsing: {
             xAxisKey: 'date',
-            yAxisKey: 'temperatureCelsius'
+            yAxisKey: 'temperatureCelsius',
         },
         scales: {
             x: {
                 type: 'time',
                 time: {
-                    unit: 'minute'
-                }
+                    unit: 'minute',
+                },
             },
             y: {
                 type: 'linear',
                 ticks: {
                     callback: function (value, index, ticks) {
                         return celsiusFormatter.format(value);
-                    }
-                }
-            }
+                    },
+                },
+            },
         },
         plugins: {
             legend: {
-                display: false
-            }
-        }
-    }
+                display: false,
+            },
+        },
+    },
 });
 
 const locationsChartElement = document.getElementById('locations-chart');
 const locationsChart = new Chart(locationsChartElement, {
     type: 'line',
     data: {
-        datasets: []
+        datasets: [],
     },
     options: {
         responsive: true,
         parsing: {
             xAxisKey: 'date',
-            yAxisKey: 'temperatureCelsius'
+            yAxisKey: 'temperatureCelsius',
         },
         scales: {
             x: {
                 type: 'time',
                 time: {
-                    unit: 'minute'
-                }
+                    unit: 'minute',
+                },
             },
             y: {
                 type: 'linear',
                 ticks: {
                     callback: function (value, index, ticks) {
                         return celsiusFormatter.format(value);
-                    }
-                }
-            }
+                    },
+                },
+            },
         },
         plugins: {
             legend: {
-                display: true
+                display: true,
             },
             colors: {
-                forceOverride: true
-            }
-        }
-    }
+                forceOverride: true,
+            },
+        },
+    },
 });
 
 const chartMeasurementsCount = 125;
@@ -179,10 +179,10 @@ async function updateAllLocationsChart() {
     locationsChart.update();
 }
 
-    /**
-     * @param {string | null} currentLocation
-     */
-    async function updateCharts(currentLocation) {
-        await updateCurrentLocationChart(currentLocation);
-await updateAllLocationsChart();
-    }
+/**
+ * @param {string | null} currentLocation
+ */
+async function updateCharts(currentLocation) {
+    await updateCurrentLocationChart(currentLocation);
+    await updateAllLocationsChart();
+}

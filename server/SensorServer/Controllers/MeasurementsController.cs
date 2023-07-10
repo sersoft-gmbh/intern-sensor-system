@@ -21,7 +21,7 @@ public class MeasurementsController : ControllerBase
     }
 
     [HttpGet]
-    public Measurement[] GetMeasurements(
+    public async Task<Measurement[]> GetMeasurements(
         [FromQuery] SortDirection? sortDirection,
         [FromQuery] int? count,
         [FromQuery] int? skip,
@@ -29,7 +29,7 @@ public class MeasurementsController : ControllerBase
         [FromQuery] DateTime? start,
         [FromQuery] DateTime? stop)
     {
-        return _measurementsRepository.AllMeasurements(
+        return await _measurementsRepository.AllMeasurements(
             sortDirection ?? SortDirection.Descending,
             count ?? 100,
             skip ?? 0,
@@ -40,38 +40,38 @@ public class MeasurementsController : ControllerBase
 
     [HttpGet]
     [Route("{id:long}")]
-    public ActionResult<Measurement> GetMeasurements([FromRoute] long id)
+    public async Task<ActionResult<Measurement>> GetMeasurements([FromRoute] long id)
     {
-        return ActionResultFor(_measurementsRepository.GetMeasurement(id));
+        return ActionResultFor(await _measurementsRepository.GetMeasurement(id));
     }
 
     [HttpGet]
     [Route("latest")]
-    public ActionResult<Measurement> GetLatestMeasurement([FromQuery] string? location)
+    public async Task<ActionResult<Measurement>> GetLatestMeasurement([FromQuery] string? location)
     {
-        return ActionResultFor(_measurementsRepository.GetLatestMeasurement(location));
+        return ActionResultFor(await _measurementsRepository.GetLatestMeasurement(location));
     }
 
     [HttpGet]
     [Route("counts")]
-    public MeasurementCounts GetMeasurementCounts([FromQuery] DateTime? start, [FromQuery] DateTime? stop)
+    public async Task<MeasurementCounts> GetMeasurementCounts([FromQuery] DateTime? start, [FromQuery] DateTime? stop)
     {
-        return _measurementsRepository.GetMeasurementCounts(start, stop);
+        return await _measurementsRepository.GetMeasurementCounts(start, stop);
     }
 
     [HttpGet]
     [Route("statistics")]
-    public MeasurementStatistics GetMeasurementStatistics([FromQuery] string? location, [FromQuery] DateTime? start,
+    public async Task<MeasurementStatistics> GetMeasurementStatistics([FromQuery] string? location, [FromQuery] DateTime? start,
         [FromQuery] DateTime? stop)
     {
-        return _measurementsRepository.GetMeasurementStatistics(location, start, stop);
+        return await _measurementsRepository.GetMeasurementStatistics(location, start, stop);
     }
 
     [HttpPut]
     [Authorize]
-    public Measurement PutMeasurement([FromBody] Measurement measurement)
+    public async Task<Measurement> PutMeasurement([FromBody] Measurement measurement)
     {
-        return _measurementsRepository.Add(measurement);
+        return await _measurementsRepository.Add(measurement);
     }
 
     #region Helpers

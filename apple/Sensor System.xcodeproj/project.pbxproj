@@ -30,6 +30,7 @@
 		073308CB29F2CC6A00756F60 /* SensorMeasurementCounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 073308CA29F2CC6A00756F60 /* SensorMeasurementCounts.swift */; };
 		075A4E1629F554FF00830693 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075A4E1529F554FF00830693 /* Location.swift */; };
 		075A4E1829F5616C00830693 /* MeasurementDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075A4E1729F5616C00830693 /* MeasurementDetailsView.swift */; };
+		07C15C4C2A5C3DB000AF3B5B /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C15C4B2A5C3DB000AF3B5B /* Logging.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,6 +58,7 @@
 		073308CA29F2CC6A00756F60 /* SensorMeasurementCounts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorMeasurementCounts.swift; sourceTree = "<group>"; };
 		075A4E1529F554FF00830693 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		075A4E1729F5616C00830693 /* MeasurementDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasurementDetailsView.swift; sourceTree = "<group>"; };
+		07C15C4B2A5C3DB000AF3B5B /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +154,7 @@
 				073308C629F27F2100756F60 /* Environment+Network.swift */,
 				073308B429F1991200756F60 /* FormatStyles.swift */,
 				0716AC2C29F5486600522038 /* View+Timer.swift */,
+				07C15C4B2A5C3DB000AF3B5B /* Logging.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -230,6 +233,7 @@
 				073308AF29F1061100756F60 /* Network.swift in Sources */,
 				073308C329F27C9D00756F60 /* LocationValuesView.swift in Sources */,
 				075A4E1629F554FF00830693 /* Location.swift in Sources */,
+				07C15C4C2A5C3DB000AF3B5B /* Logging.swift in Sources */,
 				073308C529F27D1200756F60 /* ChartsView.swift in Sources */,
 				073308B929F19B1F00756F60 /* TemperatureView.swift in Sources */,
 				0733089B29F1043E00756F60 /* ContentView.swift in Sources */,

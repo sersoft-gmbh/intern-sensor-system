@@ -61,7 +61,10 @@ extension View {
                tolerance: Duration? = nil,
                callInitially: Bool = true,
                perform work: @escaping () async -> ()) -> some View {
-        every(duration.timeInterval, tolerance: tolerance?.timeInterval, perform: work)
+        every(duration.timeInterval,
+              tolerance: tolerance?.timeInterval,
+              callInitially: callInitially,
+              perform: work)
     }
 }
 
@@ -81,6 +84,9 @@ extension View {
                              callInitially: Bool = true,
                              byExecuting work: @escaping () async -> ()) -> some View {
         let timerValues = frequency.timerValues
-        return every(timerValues.interval, tolerance: timerValues.tolerance, perform: work)
+        return every(timerValues.interval,
+                     tolerance: timerValues.tolerance,
+                     callInitially: callInitially,
+                     perform: work)
     }
 }

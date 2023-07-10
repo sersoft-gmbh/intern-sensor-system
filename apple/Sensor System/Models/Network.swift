@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 struct Network {
     private struct Request: Sendable, Hashable {
@@ -52,10 +53,19 @@ struct Network {
         decoder.dateDecodingStrategy = .iso8601
         return decoder
     }()
+    private let logger = Logger.makeAppLogger(category: "network")
 
     private func fetch<T: Decodable>(_ request: Request) async throws -> T {
         do {
+#if DEBUG
+            let (requestID, requestStart) = (UUID(), ContinuousClock.now)
+            logger.debug("Sending request (\(requestID, privacy: .public)): \(String(describing: request))")
+#endif
             let (data, response) = try await session.data(for: request.urlRequest)
+#if DEBUG
+            logger.debug("Received response (\(requestID, privacy: .public)) after \(requestStart.duration(to: .now).formatted(Duration.UnitsFormatStyle(allowedUnits: [.hours, .minutes, .seconds, .milliseconds, .microseconds, .nanoseconds], width: .abbreviated)), privacy: .public): \(response)")
+            logger.debug("Received response data (\(requestID, privacy: .public)): \(String(decoding: data, as: UTF8.self))")
+#endif
             guard let httpResponse = response as? HTTPURLResponse
             else { throw ResponseError.invalidResponse(response) }
             guard (200..<300).contains(httpResponse.statusCode)

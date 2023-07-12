@@ -3,7 +3,7 @@ name: Validate Dependencies
 on:
   pull_request:
     branches: [ main ]
-    paths: [ '**/*.csproj' ]
+    paths: [ 'server/**/*.csproj' ]
 
 jobs:
   validate-dependencies:
@@ -15,8 +15,9 @@ jobs:
           dotnet-version: '7.0.x'
       - uses: actions/cache@v3
         with:
-          path: ${{ github.workspace }}/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          path: ${{ github.workspace }}/server/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('server/**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
-      - run: dotnet restore
+      - working-directory: server
+        run: dotnet restore

@@ -1,0 +1,22 @@
+name: Validate Dependencies
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths: [ '**/*.csproj' ]
+
+jobs:
+  validate-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+      - run: dotnet restore

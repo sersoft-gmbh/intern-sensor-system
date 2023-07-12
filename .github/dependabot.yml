@@ -12,6 +12,7 @@ updates:
       - ffried
     reviewers:
       - ffried
+
   - package-ecosystem: "nuget"
     directory: "/server"
     schedule:
@@ -22,6 +23,14 @@ updates:
       - ffried
     reviewers:
       - ffried
+    groups:
+      entity-framework-core:
+        patterns:
+          - "Microsoft.EntityFrameworkCore.*"
+      aspnet-core:
+        patterns:
+          - "Microsoft.AspNetCore.*"
+
   - package-ecosystem: "docker"
     directory: "/"
     schedule:

@@ -26,9 +26,11 @@ updates:
     groups:
       entity-framework-core:
         patterns:
+          - "Microsoft.EntityFrameworkCore"
           - "Microsoft.EntityFrameworkCore.*"
       aspnet-core:
         patterns:
+          - "Microsoft.AspNetCore"
           - "Microsoft.AspNetCore.*"
 
   - package-ecosystem: "docker"

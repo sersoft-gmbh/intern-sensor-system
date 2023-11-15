@@ -62,11 +62,11 @@ struct ChartsView: View {
     private var network
 
     private var vStackSpacing: CGFloat? {
-        #if os(tvOS)
+#if os(tvOS)
         return 50
-        #else
+#else
         return nil
-        #endif
+#endif
     }
 
     var body: some View {

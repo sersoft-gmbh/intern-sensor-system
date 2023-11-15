@@ -26,7 +26,7 @@ RUN unset VERSION; \
 
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-jammy
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy
 
 ARG VERSION
 

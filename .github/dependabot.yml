@@ -1,24 +1,24 @@
 version: 2
 
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: github-actions
+    directory: /
     open-pull-requests-limit: 10
     schedule:
-      interval: "daily"
-      time: "07:00"
-      timezone: "Europe/Berlin"
+      interval: daily
+      time: '07:00'
+      timezone: Europe/Berlin
     assignees:
       - ffried
     reviewers:
       - ffried
 
-  - package-ecosystem: "nuget"
-    directory: "/server"
+  - package-ecosystem: nuget
+    directory: /server
     schedule:
-      interval: "daily"
-      time: "07:00"
-      timezone: "Europe/Berlin"
+      interval: daily
+      time: '07:00'
+      timezone: Europe/Berlin
     assignees:
       - ffried
     reviewers:
@@ -26,19 +26,19 @@ updates:
     groups:
       entity-framework-core:
         patterns:
-          - "Microsoft.EntityFrameworkCore"
-          - "Microsoft.EntityFrameworkCore.*"
+          - 'Microsoft.EntityFrameworkCore'
+          - 'Microsoft.EntityFrameworkCore.*'
       aspnet-core:
         patterns:
-          - "Microsoft.AspNetCore"
-          - "Microsoft.AspNetCore.*"
+          - 'Microsoft.AspNetCore'
+          - 'Microsoft.AspNetCore.*'
 
-  - package-ecosystem: "docker"
-    directory: "/"
+  - package-ecosystem: docker
+    directory: /
     schedule:
-      interval: "daily"
-      time: "07:00"
-      timezone: "Europe/Berlin"
+      interval: daily
+      time: '07:00'
+      timezone: Europe/Berlin
     assignees:
       - ffried
     reviewers:

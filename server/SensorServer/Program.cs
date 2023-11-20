@@ -10,7 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEntityFrameworkSqlite();
 builder.Services.AddDbContext<MeasurementsRepository>();
 
-builder.Services.AddCors(options => { options.AddDefaultPolicy(policy => policy.WithOrigins("*")); });
+builder.Services.AddHttpLogging(_ => {});
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy => policy.WithOrigins("*"));
+});
 
 builder.Services
     .AddAuthentication("Bearer")

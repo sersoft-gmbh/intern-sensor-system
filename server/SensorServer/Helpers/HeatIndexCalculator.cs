@@ -24,8 +24,7 @@ public static class HeatIndexCalculator
         switch (humidityPercent)
         {
             case < 13 when fahrenheit is >= 80 and <= 112:
-                heatIndex -= (13 - humidityPercent) * 0.25 *
-                             Math.Sqrt((17 - Math.Abs(fahrenheit - 95)) * 0.05882);
+                heatIndex -= (13 - humidityPercent) * 0.25 * Math.Sqrt((17 - Math.Abs(fahrenheit - 95)) * 0.05882);
                 break;
             case > 85 when fahrenheit is >= 80 and <= 87:
                 heatIndex += (humidityPercent - 85) * 0.1 * ((87 - fahrenheit) * 0.2);

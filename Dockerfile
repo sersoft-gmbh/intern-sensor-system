@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy as buildnode
+FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy as buildnode
 
 ARG VERSION
 
@@ -26,7 +26,7 @@ RUN unset VERSION; \
 
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-jammy
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy
 
 ARG VERSION
 

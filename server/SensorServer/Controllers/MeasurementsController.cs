@@ -54,14 +54,18 @@ public class MeasurementsController : ControllerBase
 
     [HttpGet]
     [Route("counts")]
-    public async Task<MeasurementCounts> GetMeasurementCounts([FromQuery] DateTime? start, [FromQuery] DateTime? stop)
+    public async Task<MeasurementCounts> GetMeasurementCounts(
+        [FromQuery] DateTime? start,
+        [FromQuery] DateTime? stop)
     {
         return await _measurementsRepository.GetMeasurementCounts(start, stop);
     }
 
     [HttpGet]
     [Route("statistics")]
-    public async Task<MeasurementStatistics> GetMeasurementStatistics([FromQuery] string? location, [FromQuery] DateTime? start,
+    public async Task<MeasurementStatistics> GetMeasurementStatistics(
+        [FromQuery] string? location,
+        [FromQuery] DateTime? start,
         [FromQuery] DateTime? stop)
     {
         return await _measurementsRepository.GetMeasurementStatistics(location, start, stop);

@@ -14,16 +14,15 @@ public class SimpleTokenAuthenticationHandler : AuthenticationHandler<SimpleToke
 {
     public SimpleTokenAuthenticationHandler(IOptionsMonitor<SimpleTokenAuthenticationOptions> options,
         ILoggerFactory logger,
-        UrlEncoder encoder,
-        ISystemClock clock) : base(options, logger, encoder, clock)
+        UrlEncoder encoder) : base(options, logger, encoder)
     {
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.Authorization.Any()) return Task.FromResult(AuthenticateResult.NoResult());
+        if (Request.Headers.Authorization.Count == 0) return Task.FromResult(AuthenticateResult.NoResult());
         var authHeader = Request.Headers.Authorization[0];
-        if (authHeader == null || !authHeader.ToLower().StartsWith("bearer "))
+        if (authHeader == null || !authHeader.StartsWith("bearer ", StringComparison.CurrentCultureIgnoreCase))
             return Task.FromResult(AuthenticateResult.Fail("Unauthorized"));
         var token = authHeader["bearer".Length..].Trim();
         if (!Options.AllowedTokens.Contains(token))

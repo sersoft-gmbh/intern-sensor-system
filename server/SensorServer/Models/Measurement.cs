@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using SensorServer.Helpers;
 
@@ -9,6 +10,7 @@ public class Measurement
 {
     public long? Id { get; set; }
     public DateTime Date { get; set; }
+    [MaxLength(128)]
     public string Location { get; set; } = null!;
     public double TemperatureCelsius { get; set; }
     public double TemperatureFahrenheit => TemperatureCelsius.ToFahrenheit();

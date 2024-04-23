@@ -30,7 +30,7 @@ DHT dht(DHTPIN, DHT11);
 WiFiClientSecure wifi;
 HttpClient client = HttpClient(wifi, serverAddress, serverPort);
 
-X509List cert(cert_DigiCert_Global_Root_CA);
+X509List cert(cert_ISRG_Root_X1_CA);
 
 void connectWifi() {
   WiFi.begin(wifiSSID, wifiPwd);
@@ -126,6 +126,7 @@ void setup() {
   connectWifi();
   setupTime();
 
+  cert.append(cert_DigiCert_Global_Root_CA);
   wifi.setTrustAnchors(&cert);
   setLEDColor({green, blue});
 }

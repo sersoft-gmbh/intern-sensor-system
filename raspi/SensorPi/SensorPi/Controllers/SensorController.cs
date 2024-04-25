@@ -20,15 +20,23 @@ where TTemperatureSensor : ITemperatureSensor
         GC.SuppressFinalize(this);
     }
 
-    private async Task TimerTick(LocationsController locationsController, ServerController server) {
+    private async Task SetColor(LedColor color) 
+    {
+        if (_statusLight == null) return;
+        await _statusLight.SetColor(color);
+    }
+
+    private async Task TimerTick(LocationsController locationsController, ServerController server) 
+    {
         // Set light to red and blue
-        _statusLight?.SetColor(LedColor.Red.WithBlue());
+        await SetColor(LedColor.Red.WithBlue());
         // Read current value
         var current = await _sensor.ReadCurrent();
         // If no value (null), return (turn LED off)
+        
         if (!current.HasValue)
         {
-            _statusLight?.SetColor(LedColor.Off);
+            await SetColor(LedColor.Off);
             return;
         }
          // Create new Measurement from Values
@@ -38,15 +46,21 @@ where TTemperatureSensor : ITemperatureSensor
             current.Value.Temperature.DegreesCelsius, 
             current.Value.Humidity.Percent / 100);
         _display?.WriteMeasurement(measurement);
-        // Send measurement to server.
+
+        if(measurement.TemperatureCelsius > 150 || measurement.TemperatureCelsius < -30)
+        {
+            await SetColor(LedColor.Red);
+            return;
+        }
+             // Send measurement to server.
         try {
             await server.SendMeasurement(measurement);
             // Set LED to green
-            _statusLight?.SetColor(LedColor.Green);
+            await SetColor(LedColor.Green);
         } catch (Exception ex) {
             Console.WriteLine($"Failed to send measurement: {ex}");
             // Set LED to red
-            _statusLight?.SetColor(LedColor.Red);
+            await SetColor(LedColor.Red);
         }
     }
 

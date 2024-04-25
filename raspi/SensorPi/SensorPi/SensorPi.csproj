@@ -10,7 +10,6 @@
     <ItemGroup>
       <PackageReference Include="System.Device.Gpio" Version="3.1.0" />
       <PackageReference Include="Iot.Device.Bindings" Version="3.1.0" />
-      <PackageReference Include="RaspberryIRDotNet" Version="1.0.0" />
     </ItemGroup>
 
 </Project>

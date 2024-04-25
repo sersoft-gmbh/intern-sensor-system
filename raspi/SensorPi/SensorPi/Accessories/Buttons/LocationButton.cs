@@ -2,7 +2,7 @@ using System.Device.Gpio;
 using SensorPi.Accessories.Base;
 using SensorPi.Controllers;
 
-namespace SensorPi.Accessories;
+namespace SensorPi.Accessories.Buttons;
 
 public sealed class LocationButton : BaseGpioAccessory {
     private readonly int _pin;

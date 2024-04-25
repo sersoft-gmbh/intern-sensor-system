@@ -50,7 +50,20 @@ struct Network {
     private let session = URLSession.shared
     private let jsonDecoder: JSONDecoder = {
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
+        let iso8601FormatterFractionalSeconds = ISO8601DateFormatter()
+        iso8601FormatterFractionalSeconds.formatOptions = [
+            .withInternetDateTime,
+            .withFractionalSeconds,
+        ]
+        let iso8601FormatterFixedSeconds = ISO8601DateFormatter()
+        iso8601FormatterFixedSeconds.formatOptions = .withInternetDateTime
+        decoder.dateDecodingStrategy = .custom {
+            let container = try $0.singleValueContainer()
+            let string = try container.decode(String.self)
+            guard let date = iso8601FormatterFractionalSeconds.date(from: string) ?? iso8601FormatterFixedSeconds.date(from: string)
+            else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected date string to be ISO8601-formatted.") }
+            return date
+        }
         return decoder
     }()
     private let logger = Logger.makeAppLogger(category: "network")

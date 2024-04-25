@@ -13,6 +13,7 @@ jobs:
     outputs:
       has-relevant-changes: ${{ steps.changes.outputs.workflow || steps.changes.outputs.docker || steps.changes.outputs.server }}
     steps:
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: changes
         with:

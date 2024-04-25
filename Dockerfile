@@ -1,5 +1,6 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy as buildnode
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine as buildnode
 
+ARG TARGETPLATFORM
 ARG VERSION
 
 LABEL description="This image builds the Sensor Server"
@@ -7,26 +8,56 @@ LABEL vendor="ser.soft GmbH"
 LABEL maintainer="florian.friedrich@sersoft.de"
 LABEL version="${VERSION}"
 
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
 RUN apt-get update --quiet \
     && apt-get install --quiet --yes --no-install-recommends openssl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /sensor-server
 
+RUN <<EOC
+set -eux
+case "${TARGETPLATFORM}" in
+    'linux/amd64') export RUNTIME_ID='linux-musl-x64' ;;
+    'linux/arm64') export RUNTIME_ID='linux-musl-arm64' ;;
+    *)
+      echo "Unsupported platform: ${TARGETPLATFORM}"
+      exit 1
+    ;;
+esac
+echo -n "${RUNTIME_ID}" > /tmp/runtime-id
+EOC
+
 COPY server/*.sln .
 WORKDIR /sensor-server/SensorServer
 COPY server/SensorServer/*.csproj .
 WORKDIR /sensor-server
 RUN unset VERSION; \
-    dotnet restore
+    dotnet restore --runtime "$(cat /tmp/runtime-id)"
 
 COPY server/ ./
-RUN unset VERSION; \
-	dotnet publish --no-restore -c release -o /dist
+
+RUN <<EOC
+set -eux
+RUNTIME_ID="$(cat /tmp/runtime-id)"
+if echo "${VERSION}" | grep -Eq '^[0-9]+.[0-9]+.[0-9]+'; then
+  PROJECT_VERSION="${VERSION}"
+else
+  PROJECT_VERSION="0.0.1-${VERSION}"
+fi
+rm -f appsettings.Development.json
+unset VERSION
+dotnet publish --no-restore \
+  --configuration release \
+  --runtime "${RUNTIME_ID}" \
+  --no-self-contained \
+  --output ./dist \
+  -p:Version="${PROJECT_VERSION}"
+EOC
 
 
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 
 ARG VERSION
 
@@ -35,22 +66,24 @@ LABEL vendor="ser.soft GmbH"
 LABEL maintainer="florian.friedrich@sersoft.de"
 LABEL version="${VERSION}"
 
-RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
-    && apt-get -qq update && apt-get -q dist-upgrade -y && apt-get -q install -y curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /sensor-server \
-    && mkdir -p /sensor-server/data \
-    && groupadd --gid 1000 sensor-server \
-    && useradd --uid 1000 --gid 1000 -m sensor-server \
-    && chown -R sensor-server:sensor-server /sensor-server
+ENV TZ=UTC
+ENV SERVER_PORT=8080
+ENV ASPNETCORE_URLS=http://+:${SERVER_PORT}
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
+RUN <<EOC
+set -eux
+apk add --update --no-cache curl icu-libs icu-data-full
+mkdir -p /sensor-server/data
+addgroup --system --gid 1000 sensor-server
+adduser --system --uid 1000 --ingroup sensor-server --home /sensor-server sensor-server
+chown -R sensor-server:sensor-server /sensor-server
+EOC
 
 WORKDIR /sensor-server
 
 USER sensor-server:sensor-server
-
-ENV SERVER_PORT=8080
-ENV ASPNETCORE_URLS=http://0.0.0.0:${SERVER_PORT}
-ENV ASPNETCORE_ENVIRONMENT Production
 
 EXPOSE ${SERVER_PORT}
 
@@ -62,4 +95,4 @@ VOLUME [ "/sensor-server/data" ]
 HEALTHCHECK --interval=10s --timeout=3s --start-period=30s \
     CMD ["/usr/local/bin/docker-healthcheck.sh"]
 
-ENTRYPOINT ["dotnet", "/sensor-server/SensorServer.dll"]
+ENTRYPOINT ["/sensor-server/SensorServer"]

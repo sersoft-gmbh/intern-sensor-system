@@ -6,82 +6,140 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+'
     branches:
       - main
-    paths:
-      - '.github/workflows/deploy.yml'
-      - 'bin/**'
-      - 'server/**'
-      - 'Dockerfile'
-      - '.dockerignore'
 
 jobs:
-  determine-deployment-config:
+  check-files:
     runs-on: ubuntu-latest
     outputs:
-      environment: ${{ steps.determine-environment.outputs.environment }}
+      has-relevant-changes: ${{ steps.changes.outputs.workflow || steps.changes.outputs.docker || steps.changes.outputs.server }}
     steps:
-      - name: Determine environment
-        id: determine-environment
-        env:
-          REF_TYPE: ${{ github.ref_type }}
-        run: |
-          if [ "${REF_TYPE}" == 'tag' ]; then
-            echo 'environment=production' >> "${GITHUB_OUTPUT}"
-          else
-            echo 'environment=development' >> "${GITHUB_OUTPUT}"
-          fi
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            workflow:
+              - '.github/workflows/deploy.yml'
+            docker:
+              - 'bin/**'
+              - 'Dockerfile'
+              - '.dockerignore'
+            server:
+              - 'server/**'
 
   run-deployment:
-    needs: determine-deployment-config
-    environment: ${{ needs.determine-deployment-config.outputs.environment }}
+    needs: check-files
+    if: ${{ needs.check-files.outputs.has-relevant-changes == 'true' }}
+    environment: ${{ github.ref_type == 'tag' && 'production' || 'development'}}
     runs-on: ubuntu-latest
     steps:
+      - uses: docker/metadata-action@v5.5.1
+        id: image-meta
+        with:
+          images: ${{ vars.DOCKER_REGISTRY }}/${{ vars.DOCKER_IMAGE }}
+          flavor: latest=false
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha,format=short,prefix=rev-,enable=${{ github.ref_type != 'tag' }}
+            type=raw,value=stable,priority=50,enable=${{ github.ref_type == 'tag' }}
+            type=raw,value=latest,priority=50,enable=${{ github.ref_type != 'tag' }}
       - name: Get image parameters
         id: image-parameters
+        shell: bash
         env:
           IS_RELEASE: ${{ github.ref_type == 'tag' }}
-          RELEASE_TAG: ${{ github.ref_name }}
-          SHA: ${{ github.sha }}
+          IMAGE_VERSION: ${{ steps.image-meta.outputs.version }}
+          META_JSON: ${{ steps.image-meta.outputs.json }}
         run: |
           VERSION_TAG=''
-          LATEST_TAG=''
-          if [ "${IS_RELEASE}" == 'true' ]; then
-            VERSION_TAG="${RELEASE_TAG}"
-            LATEST_TAG='stable'
+          if [ "${IS_RELEASE}" = 'true' ]; then
+            VERSION_TAG="${IMAGE_VERSION}"
           else
-            VERSION_TAG="rev-$(echo "${SHA}" | cut -c1-7)"
-            LATEST_TAG='latest'
+            VERSION_TAG="$(echo -n "${META_JSON}" | jq --raw-output '
+              .tags
+              | map(split(":")
+                | .[1:]
+                | join(":")
+                | select(startswith("rev-")))
+              | first')"
           fi
-          echo "latest-tag=${LATEST_TAG}" >> "${GITHUB_OUTPUT}"
-          echo "version-tag=${VERSION_TAG}" >> "${GITHUB_OUTPUT}"
           echo "version-arg=${VERSION_TAG}" >> "${GITHUB_OUTPUT}"
-      - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+      - uses: docker/setup-qemu-action@v3.0.0
+      - uses: docker/setup-buildx-action@v3.3.0
+      - uses: docker/login-action@v3.1.0
         with:
-          registry: ${{ vars.DOCKER_REGISTRY }}
+          registry: ${{ vars.DOCKER_IMAGE }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - uses: docker/build-push-action@v5
+      - uses: docker/build-push-action@v5.3.0
         with:
           pull: true
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           build-args: |
             VERSION=${{ steps.image-parameters.outputs.version-arg }}
-          tags: |
-            ${{ vars.DOCKER_REGISTRY }}/${{ vars.DOCKER_IMAGE }}:${{ steps.image-parameters.outputs.version-tag }}
-            ${{ vars.DOCKER_REGISTRY }}/${{ vars.DOCKER_IMAGE }}:${{ steps.image-parameters.outputs.latest-tag }}
+          tags: ${{ steps.image-meta.outputs.tags }}
+          labels: ${{ steps.image-meta.outputs.labels }}
+          annotations: ${{ steps.image-meta.outputs.annotations }}
+          sbom: true
+          provenance: mode=min
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - uses: fjogeleit/http-request-action@v1
+      - name: Generate SBOM name
+        id: sbom-name
+        shell: bash
+        env:
+          REPO: ${{ github.repository }}
+          IMAGE_VERSION: ${{ steps.image-meta.outputs.version }}
+        run: echo "artifact-name=${REPO##*/}-${IMAGE_VERSION}-sbom.spdx" >> "${GITHUB_OUTPUT}"
+      - uses: anchore/sbom-action@v0
+        with:
+          image: ${{ fromJson(steps.image-meta.outputs.json).tags[0] }}
+          artifact-name: ${{ steps.sbom-name.outputs.artifact-name }}
+          dependency-snapshot: true
+      - uses: actions/checkout@v4
+        with:
+          path: .sarif-scan-temp
+          sparse-checkout: Dockerfile
+          sparse-checkout-cone-mode: false
+      - name: Pull built image
+        shell: bash
+        env:
+          DOCKER_IMAGE: ${{ fromJson(steps.image-meta.outputs.json).tags[0] }}
+        run: docker pull "${DOCKER_IMAGE}"
+      - uses: crazy-max/ghaction-container-scan@v3
+        # continue-on-error: true
+        id: image-scan
+        with:
+          image: ${{ fromJson(steps.image-meta.outputs.json).tags[0] }}
+          dockerfile: ./.sarif-scan-temp/Dockerfile
+          annotations: true
+      - uses: github/codeql-action/upload-sarif@v3
+        if: ${{ steps.image-scan.outputs.sarif != '' }}
+        continue-on-error: true # if advanced security is disabled, this will fail.
+        with:
+          sarif_file: ${{ steps.image-scan.outputs.sarif }}
+      - name: Build Payload
+        id: build-payload
+        shell: bash
+        env:
+          TAGS: ${{ steps.image-meta.outputs.tags }}
+        run: |
+          JSON_PAYLOAD="$(echo -n "${TAGS}" | jq --raw-input --slurp --raw-output --compact-output '
+            split(" |\n"; null)
+            | map(split(":") | select(length >= 2))
+            | reduce .[] as $i (null; .[($i[0])] += [($i[1:] | join(":"))])
+            | to_entries
+            | map({"image": .key, "tags": .value})')"
+          echo "payload=${JSON_PAYLOAD}" >> "${GITHUB_OUTPUT}"
+      - uses: fjogeleit/http-request-action@v1.15.5
         with:
           method: POST
-          url: "${{ secrets.DEPLOYER_URL }}/api/v1/deploy"
+          url: ${{ secrets.DEPLOYER_URL }}/api/v1/deploy
           bearerToken: ${{ secrets.DEPLOYER_TOKEN }}
-          timeout: 0
-          data: |
-            {
-              "image": "${{ vars.DOCKER_IMAGE }}",
-              "tags": [ "${{ steps.image-parameters.outputs.version-tag }}", "${{ steps.image-parameters.outputs.latest-tag }}" ]
-            }
-
+          timeout: 150000 # 2.5 minutes
+          retry: 3
+          retryWait: 3000 # 3 seconds
+          contentType: application/json
+          data: ${{ steps.build-payload.outputs.payload }}

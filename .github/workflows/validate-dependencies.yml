@@ -3,21 +3,39 @@ name: Validate Dependencies
 on:
   pull_request:
     branches: [ main ]
-    paths: [ 'server/**/*.csproj' ]
+
+permissions:
+  pull-requests: read
+  contents: read
 
 jobs:
-  validate-dependencies:
+  check-files:
     runs-on: ubuntu-latest
+    outputs:
+      has-relevant-changes: ${{ steps.changes.outputs.csprojects }}
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            csprojects:
+              - '*.csproj'
+              - '**/*.csproj'
+
+  validate-dependencies:
+    needs: check-files
+    if: ${{ needs.check-files.outputs.has-relevant-changes == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
-      - uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/server/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('server/**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
+          dotnet-version: '8.0'
+          cache: true
+          cache-dependency-path: '*/*.csproj'
       - working-directory: server
         run: dotnet restore

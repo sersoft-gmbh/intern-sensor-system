@@ -84,7 +84,7 @@ USER sensor-server:sensor-server
 EXPOSE ${SERVER_PORT}
 
 COPY bin/docker-healthcheck.sh /usr/local/bin/docker-healthcheck.sh
-COPY --from=buildnode /dist/ ./
+COPY --from=buildnode /sensor-server/dist/ ./
 
 VOLUME [ "/sensor-server/data" ]
 

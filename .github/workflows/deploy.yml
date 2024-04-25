@@ -30,6 +30,9 @@ jobs:
   run-deployment:
     needs: check-files
     if: ${{ needs.check-files.outputs.has-relevant-changes == 'true' }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     environment: ${{ github.ref_type == 'tag' && 'production' || 'development'}}
     runs-on: ubuntu-latest
     steps:

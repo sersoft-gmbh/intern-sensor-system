@@ -10,10 +10,6 @@ LABEL version="${VERSION}"
 
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
-RUN apt-get update --quiet \
-    && apt-get install --quiet --yes --no-install-recommends openssl ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /sensor-server
 
 RUN <<EOC

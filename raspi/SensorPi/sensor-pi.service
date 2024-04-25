@@ -1,0 +1,12 @@
+[Unit]
+Description=Intern Sensor Pi Service
+After=network.target
+
+[Service]
+WorkingDirectory=/home/intern/Projects/intern-sensor-system/raspi/SensorPi/SensorPi
+Environment=DOTNET_CLI_HOME=/home/intern DOTNET_ROOT=/home/intern/.dotnet
+ExecStart=/home/intern/.dotnet/dotnet run -c release
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

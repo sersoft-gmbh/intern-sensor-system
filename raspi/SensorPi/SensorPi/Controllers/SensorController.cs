@@ -45,7 +45,8 @@ where TTemperatureSensor : ITemperatureSensor
             locationsController.GetCurrentLocation(),
             current.Value.Temperature.DegreesCelsius, 
             current.Value.Humidity.Percent / 100);
-        _display?.WriteMeasurement(measurement);
+        if (_display != null)
+            await _display.WriteMeasurement(measurement);
 
         if(measurement.TemperatureCelsius > 150 || measurement.TemperatureCelsius < -30)
         {

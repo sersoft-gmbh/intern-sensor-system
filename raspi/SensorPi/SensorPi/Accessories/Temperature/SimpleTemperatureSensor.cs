@@ -28,11 +28,13 @@ public sealed class SimpleTemperatureSensor : ITemperatureSensor {
 
     private TemperatureValues? ReadCurrentSync() {
         var now = DateTime.Now;
-        if (now.Subtract(lastRead) < ReadDelay)
-            return null;
-        lastRead = now;
-        if (_dht.TryReadTemperature(out var temp) && _dht.TryReadHumidity(out var humidity))
-            return new TemperatureValues(now, temp, humidity);
+        lock(_dht) {
+            if (now.Subtract(lastRead) < ReadDelay)
+                return null;
+            lastRead = now;
+            if (_dht.TryReadTemperature(out var temp) && _dht.TryReadHumidity(out var humidity))
+                return new TemperatureValues(now, temp, humidity);
+        }
         return null;
     }
 

@@ -1,9 +1,8 @@
 using SensorPi.Accessories;
-using SensorPi.Models;
 
 namespace SensorPi.Controllers;
 
-public sealed class LocationsController
+public sealed class LocationsController(WideDisplay? display = null)
 {
     private static readonly string[] Locations = [
         "Office Desk", 
@@ -11,21 +10,16 @@ public sealed class LocationsController
         "Bedroom",
     ];
 
+    private readonly object locker = new();
     private int _currentLocationIndex = 0;
+    private readonly WideDisplay? _display = display;
 
-    private readonly StatusLight? _statusLight;
-    private readonly WideDisplay? _display;
+    public string GetCurrentLocation() {
+        lock(locker) return Locations[_currentLocationIndex];
+    } 
 
-    public LocationsController(StatusLight? statusLight = null, WideDisplay? display = null)
+    public async Task SwitchCurrentLocationTo(int index) 
     {
-        _statusLight = statusLight;
-        _display = display;
-        _display?.WriteLocation(GetCurrentLocation());
-    }
-
-    public string GetCurrentLocation() => Locations[_currentLocationIndex];
-
-    public async Task SwitchCurrentLocationTo(int index) {
         // Verify index is valid and set to _currentLocationIndex
         while (index < 0 || index >= Locations.Length) {
             if (index >=  Locations.Length) {
@@ -34,15 +28,19 @@ public sealed class LocationsController
                 index +=  Locations.Length;
             }
         }     
-        if (index == _currentLocationIndex) return;
-        _currentLocationIndex = index;
-        _display?.WriteLocation(GetCurrentLocation());
-        if (_statusLight != null)
-            await _statusLight.Blink(LedColor.Red.WithGreen().WithBlue());
+        lock(locker) {
+            if (index == _currentLocationIndex) return;
+            _currentLocationIndex = index;
+        }
+        if (_display != null)
+            await _display.ShowActivityIndicator();
     }
 
-    public async Task SwitchCurrentLocationBy(int diff) {
+    public async Task SwitchCurrentLocationBy(int diff) 
+    {
         if (diff == 0) return;
-        await SwitchCurrentLocationTo(_currentLocationIndex + diff);
+        int currentIndex;
+        lock(locker) currentIndex = _currentLocationIndex;
+        await SwitchCurrentLocationTo(currentIndex + diff);
     }
 }

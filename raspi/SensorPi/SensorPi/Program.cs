@@ -29,14 +29,15 @@ using var statusLight = new StatusLight(LedRPin, LedGPin, LedBPin, gpioControlle
 // using var temperatureSensor = new SimpleTemperatureSensor(DhtPin, gpioController);
 using var temperatureSensor = new AdvancedTemperatureSensor(I2CBus, Bme680Address);
 
-var locationsController = new LocationsController(statusLight, display);
+var locationsController = new LocationsController(display);
+var nightModeController = new NightModeController(display, statusLight);
 
 using var serverController = new ServerController(new Uri(ServerAddress), ServerToken);
 using var sensorsController = new SensorsController<AdvancedTemperatureSensor>(temperatureSensor, statusLight, display);
 
-using var nightModeButton = new NightModeButton(DarkModeButtonPin, statusLight, display, gpioController, false);
+using var nightModeButton = new NightModeButton(DarkModeButtonPin, nightModeController, gpioController, false);
 using var locationButton = new LocationButton(LocationButtonPin, locationsController, gpioController, false);
-using var irRemote = new IrRemote(IrRemoteName, locationsController, nightModeButton);
+using var irRemote = new IrRemote(IrRemoteName, locationsController, nightModeController);
 
 try {
     sensorsController.StartReading(serverController, locationsController);

@@ -6,14 +6,13 @@ using SensorPi.Controllers;
 
 namespace SensorPi.Accessories;
 
-public sealed class IrRemote(string remoteName, LocationsController locationsController, NightModeButton nightModeButton) : IDisposable 
+public sealed class IrRemote(string remoteName, LocationsController locationsController, NightModeController nightModeController) : IDisposable 
 {
     const string IrSocketName = "/var/run/lirc/lircd";
 
     private readonly string _remoteName = remoteName;
     private readonly LocationsController _locationsController = locationsController;
-    private readonly NightModeButton _nightModeButton = nightModeButton;
-
+    private readonly NightModeController _nightModeController = nightModeController;
 
     private CancellationTokenSource _cancellationSource = new();
     private Task? _readingTask;
@@ -32,7 +31,7 @@ public sealed class IrRemote(string remoteName, LocationsController locationsCon
             case "KEY_B": break;
             case "KEY_C": break;
             case "KEY_X": 
-                _nightModeButton.ToggleNightMode();
+                await _nightModeController.ToggleNightMode();
                 break; 
             case "KEY_UP":
                 await _locationsController.SwitchCurrentLocationBy(1);

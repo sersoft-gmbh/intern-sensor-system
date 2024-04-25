@@ -3,29 +3,20 @@ using SensorServer.Models;
 
 namespace SensorServer.Repositories;
 
-public class MeasurementsRepository : DbContext
+public sealed class MeasurementsRepository(IConfiguration configuration, ILogger<MeasurementsRepository> logger) : DbContext
 {
     private static ILoggerFactory ContextLoggerFactory
         => LoggerFactory.Create(b => b.AddConsole().AddFilter("", LogLevel.Information));
     private static bool _didLogConnectionString;
 
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<MeasurementsRepository> _logger;
-
     public DbSet<Measurement> Measurements { get; set; } = null!;
-
-    public MeasurementsRepository(IConfiguration configuration, ILogger<MeasurementsRepository> logger)
-    {
-        _configuration = configuration;
-        _logger = logger;
-    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var connectionString = _configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
         if (!_didLogConnectionString)
         {
-            _logger.LogInformation("Using database connection string: {ConnectionString}", connectionString);
+            logger.LogInformation("Using database connection string: {ConnectionString}", connectionString);
             _didLogConnectionString = true;
         }
 

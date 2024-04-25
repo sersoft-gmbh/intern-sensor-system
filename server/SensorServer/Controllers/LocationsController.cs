@@ -5,7 +5,7 @@ namespace SensorServer.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class LocationsController : ControllerBase
+public sealed class LocationsController : ControllerBase
 {
     private readonly MeasurementsRepository _measurementsRepository;
     private readonly ILogger<LocationsController> _logger;

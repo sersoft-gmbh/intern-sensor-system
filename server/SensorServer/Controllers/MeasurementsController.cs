@@ -7,18 +7,12 @@ namespace SensorServer.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class MeasurementsController : ControllerBase
+public sealed class MeasurementsController(
+    MeasurementsRepository measurementsRepository,
+    ILogger<MeasurementsController> logger)
+    : ControllerBase
 {
-    private readonly MeasurementsRepository _measurementsRepository;
-    private readonly ILogger<MeasurementsController> _logger;
-
-    public MeasurementsController(
-        MeasurementsRepository measurementsRepository,
-        ILogger<MeasurementsController> logger)
-    {
-        _measurementsRepository = measurementsRepository;
-        _logger = logger;
-    }
+    private readonly ILogger<MeasurementsController> _logger = logger;
 
     [HttpGet]
     public async Task<Measurement[]> GetMeasurements(
@@ -29,7 +23,7 @@ public class MeasurementsController : ControllerBase
         [FromQuery] DateTime? start,
         [FromQuery] DateTime? stop)
     {
-        return await _measurementsRepository.AllMeasurements(
+        return await measurementsRepository.AllMeasurements(
             sortDirection ?? SortDirection.Descending,
             count ?? 100,
             skip ?? 0,
@@ -42,14 +36,14 @@ public class MeasurementsController : ControllerBase
     [Route("{id:long}")]
     public async Task<ActionResult<Measurement>> GetMeasurements([FromRoute] long id)
     {
-        return ActionResultFor(await _measurementsRepository.GetMeasurement(id));
+        return ActionResultFor(await measurementsRepository.GetMeasurement(id));
     }
 
     [HttpGet]
     [Route("latest")]
     public async Task<ActionResult<Measurement>> GetLatestMeasurement([FromQuery] string? location)
     {
-        return ActionResultFor(await _measurementsRepository.GetLatestMeasurement(location));
+        return ActionResultFor(await measurementsRepository.GetLatestMeasurement(location));
     }
 
     [HttpGet]
@@ -58,7 +52,7 @@ public class MeasurementsController : ControllerBase
         [FromQuery] DateTime? start,
         [FromQuery] DateTime? stop)
     {
-        return await _measurementsRepository.GetMeasurementCounts(start, stop);
+        return await measurementsRepository.GetMeasurementCounts(start, stop);
     }
 
     [HttpGet]
@@ -68,23 +62,22 @@ public class MeasurementsController : ControllerBase
         [FromQuery] DateTime? start,
         [FromQuery] DateTime? stop)
     {
-        return await _measurementsRepository.GetMeasurementStatistics(location, start, stop);
+        return await measurementsRepository.GetMeasurementStatistics(location, start, stop);
     }
 
     [HttpPut]
     [Authorize]
     public async Task<Measurement> PutMeasurement([FromBody] Measurement measurement)
     {
-        return await _measurementsRepository.Add(measurement);
+        return await measurementsRepository.Add(measurement);
     }
 
     #region Helpers
-
+    [NonAction]
     private ActionResult<Measurement> ActionResultFor(Measurement? measurement)
     {
         if (measurement == null) return NotFound();
         return measurement;
     }
-
     #endregion
 }

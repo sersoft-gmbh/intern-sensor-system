@@ -6,14 +6,17 @@ namespace SensorServer.Models;
 
 [Index(nameof(Date))]
 [Index(nameof(Location))]
-public class Measurement
+public sealed class Measurement
 {
+    [Range(0, long.MaxValue)]
     public long? Id { get; set; }
     public DateTime Date { get; set; }
-    [MaxLength(128)]
+    [MinLength(3), MaxLength(128)]
     public string Location { get; set; } = null!;
+    [Range(-60, 60)]
     public double TemperatureCelsius { get; set; }
     public double TemperatureFahrenheit => TemperatureCelsius.ToFahrenheit();
+    [Range(0, 1)]
     public double HumidityPercent { get; set; }
 
     public double HeatIndexFahrenheit => this.CalculateHeatIndexInFahrenheit();

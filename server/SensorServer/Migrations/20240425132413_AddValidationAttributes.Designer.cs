@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SensorServer.Repositories;
 
@@ -10,9 +11,11 @@ using SensorServer.Repositories;
 namespace SensorServer.Migrations
 {
     [DbContext(typeof(MeasurementsRepository))]
-    partial class MeasurementsRepositoryModelSnapshot : ModelSnapshot
+    [Migration("20240425132413_AddValidationAttributes")]
+    partial class AddValidationAttributes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.4");

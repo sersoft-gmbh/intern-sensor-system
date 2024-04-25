@@ -2,7 +2,7 @@ using SensorServer.Helpers;
 
 namespace SensorServer.Models;
 
-public class MeasurementStatistics
+public sealed class MeasurementStatistics
 {
     public double? AverageTemperatureCelsius { get; init; }
     public double? AverageTemperatureFahrenheit => AverageTemperatureCelsius?.ToFahrenheit();

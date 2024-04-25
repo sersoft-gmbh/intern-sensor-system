@@ -5,19 +5,17 @@ using Microsoft.Extensions.Options;
 
 namespace SensorServer.Helpers;
 
-public class SimpleTokenAuthenticationOptions : AuthenticationSchemeOptions
+public sealed class SimpleTokenAuthenticationOptions : AuthenticationSchemeOptions
 {
     public IReadOnlySet<string> AllowedTokens { get; set; } = new HashSet<string>();
 }
 
-public class SimpleTokenAuthenticationHandler : AuthenticationHandler<SimpleTokenAuthenticationOptions>
+public sealed class SimpleTokenAuthenticationHandler(
+    IOptionsMonitor<SimpleTokenAuthenticationOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder)
+    : AuthenticationHandler<SimpleTokenAuthenticationOptions>(options, logger, encoder)
 {
-    public SimpleTokenAuthenticationHandler(IOptionsMonitor<SimpleTokenAuthenticationOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder) : base(options, logger, encoder)
-    {
-    }
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (Request.Headers.Authorization.Count == 0) return Task.FromResult(AuthenticateResult.NoResult());

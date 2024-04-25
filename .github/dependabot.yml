@@ -33,6 +33,17 @@ updates:
           - 'Microsoft.AspNetCore'
           - 'Microsoft.AspNetCore.*'
 
+  - package-ecosystem: nuget
+    directory: /raspi
+    schedule:
+      interval: daily
+      time: '07:00'
+      timezone: Europe/Berlin
+    assignees:
+      - ffried
+    reviewers:
+      - ffried
+
   - package-ecosystem: docker
     directory: /
     schedule:

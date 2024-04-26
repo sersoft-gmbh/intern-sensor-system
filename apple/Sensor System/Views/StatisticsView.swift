@@ -9,11 +9,11 @@ struct StatisticsView: View {
     var kind: StatisticsKind
     var showLocation: Bool
 
-    private var measurements: (temperature: SensorMeasurement?, humidity: SensorMeasurement?) {
+    private var measurements: (temperature: SensorMeasurement?, humidity: SensorMeasurement?, pressure: SensorMeasurement?) {
         switch kind {
-        case .min: return (statistics.minTemperature, statistics.minHumidity)
-        case .median: return (statistics.medianTemperature, statistics.medianHumidity)
-        case .max: return (statistics.maxTemperature, statistics.maxHumidity)
+        case .min: return (statistics.minTemperature, statistics.minHumidity, statistics.minPressure)
+        case .median: return (statistics.medianTemperature, statistics.medianHumidity, statistics.medianPressure)
+        case .max: return (statistics.maxTemperature, statistics.maxHumidity, statistics.maxPressure)
         }
     }
 
@@ -34,8 +34,8 @@ struct StatisticsView: View {
     }
 
     var body: some View {
-        let (temperature, humidity) = measurements
-        if temperature != nil || humidity != nil {
+        let (temperature, humidity, pressure) = measurements
+        if temperature != nil || humidity != nil || pressure != nil {
             ValueBox(style: .group(spacing: 8), titleKey) {
                 if let temperature {
                     TemperatureView(measurement: temperature,
@@ -48,6 +48,11 @@ struct StatisticsView: View {
                                  displayOptions: displayOptions)
                     .transition(.opacity)
                 }
+                if let pressure {
+                    PressureView(measurement: pressure,
+                                 displayOptions: displayOptions)
+                    .transition(.opacity)
+                }
             }
             .multilineTextAlignment(.center)
             .transition(.opacity)
@@ -56,8 +61,8 @@ struct StatisticsView: View {
 }
 
 #if DEBUG
-struct StatisticsView_Previews: PreviewProvider {
-    static var previews: some View {
+#Preview {
+    VStack {
         StatisticsView(statistics: .preview, kind: .min, showLocation: true)
         StatisticsView(statistics: .preview, kind: .median, showLocation: true)
         StatisticsView(statistics: .preview, kind: .max, showLocation: true)

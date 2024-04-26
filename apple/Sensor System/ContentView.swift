@@ -84,45 +84,45 @@ struct ContentView: View {
         }
 #endif
     }
-    
+
     var body: some View {
         content
-        .animation(.default, value: locations)
-        .animation(.default, value: selectedTab)
-        .onChange(of: locations) {
+            .animation(.default, value: locations)
+            .animation(.default, value: selectedTab)
+            .onChange(of: locations) {
 #if os(macOS)
-            if !$0.contains(selectedLocation) {
-                selectedLocation = .all
-            }
+                if !$1.contains(selectedLocation) {
+                    selectedLocation = .all
+                }
 #else
-            if selectedLocation.map($0.contains) != true {
-                selectedLocation = .default
-            }
+                if selectedLocation.map($1.contains) != true {
+                    selectedLocation = .default
+                }
 #endif
-        }
-        .onChange(of: selectedLocationName) {
-            selectedLocation = $0.map(Location.named) ?? .default
-        }
-        .onChange(of: selectedLocation) {
-            switch $0 {
+            }
+            .onChange(of: selectedLocationName) {
+                selectedLocation = $1.map(Location.named) ?? .default
+            }
+            .onChange(of: selectedLocation) {
+                switch $1 {
 #if !os(macOS)
-            case nil: selectedLocationName = nil
+                case nil: fallthrough
 #endif
-            case .all: selectedLocationName = nil
-            case .named(let name): selectedLocationName = name
+                case .all: selectedLocationName = nil
+                case .named(let name): selectedLocationName = name
+                }
             }
-        }
-        .onAppear {
-            let _selectedLocationName: String?
+            .onAppear {
+                let _selectedLocationName: String?
 #if os(macOS)
-            _selectedLocationName = selectedLocation.locationName
+                _selectedLocationName = selectedLocation.locationName
 #else
-            _selectedLocationName = selectedLocation?.locationName
+                _selectedLocationName = selectedLocation?.locationName
 #endif
-            if selectedLocationName != _selectedLocationName {
-                selectedLocation = selectedLocationName.map(Location.named) ?? .default
+                if selectedLocationName != _selectedLocationName {
+                    selectedLocation = selectedLocationName.map(Location.named) ?? .default
+                }
             }
-        }
     }
 
     private func locationsDetails(for location: Location) -> some View {
@@ -151,9 +151,7 @@ struct ContentView: View {
 }
 
 #if DEBUG
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+#Preview {
+    ContentView()
 }
 #endif

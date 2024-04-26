@@ -7,8 +7,9 @@ struct SensorMeasurement: Sendable, Hashable, Codable, Identifiable {
 
     private let temperatureCelsius: Double
 //    let temperatureFahrenheit: Double
-
     let humidityPercent: Double
+
+    private let pressureHectopascals: Double?
 
     private let heatIndexCelsius: Double
 //    let heatIndexFahrenheit: Double
@@ -20,6 +21,12 @@ struct SensorMeasurement: Sendable, Hashable, Codable, Identifiable {
     var heatIndex: Measurement<UnitTemperature> {
         .init(value: heatIndexCelsius, unit: .celsius)
     }
+
+    var pressure: Measurement<UnitPressure>? {
+        pressureHectopascals.map {
+            .init(value: $0, unit: .hectopascals)
+        }
+    }
 }
 
 #if DEBUG
@@ -30,6 +37,7 @@ extension SensorMeasurement {
               location: "Preview Location",
               temperatureCelsius: 21.5,
               humidityPercent: 0.385,
+              pressureHectopascals: 1010.3,
               heatIndexCelsius: 20.8)
     }
 

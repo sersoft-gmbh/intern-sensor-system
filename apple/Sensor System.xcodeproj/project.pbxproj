@@ -31,6 +31,8 @@
 		075A4E1629F554FF00830693 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075A4E1529F554FF00830693 /* Location.swift */; };
 		075A4E1829F5616C00830693 /* MeasurementDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075A4E1729F5616C00830693 /* MeasurementDetailsView.swift */; };
 		07C15C4C2A5C3DB000AF3B5B /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C15C4B2A5C3DB000AF3B5B /* Logging.swift */; };
+		07E160172BDC007A005EF1C0 /* PressureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E160162BDC007A005EF1C0 /* PressureView.swift */; };
+		07E160192BDC0B9A005EF1C0 /* PlottableMeasurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E160182BDC0B9A005EF1C0 /* PlottableMeasurement.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +61,8 @@
 		075A4E1529F554FF00830693 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		075A4E1729F5616C00830693 /* MeasurementDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasurementDetailsView.swift; sourceTree = "<group>"; };
 		07C15C4B2A5C3DB000AF3B5B /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		07E160162BDC007A005EF1C0 /* PressureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressureView.swift; sourceTree = "<group>"; };
+		07E160182BDC0B9A005EF1C0 /* PlottableMeasurement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlottableMeasurement.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +121,7 @@
 				075A4E1529F554FF00830693 /* Location.swift */,
 				073308AE29F1061100756F60 /* Network.swift */,
 				0716AC2A29F545E300522038 /* SensorMeasurementDisplayOptions.swift */,
+				07E160182BDC0B9A005EF1C0 /* PlottableMeasurement.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -144,6 +149,7 @@
 				073308C029F19E8800756F60 /* StatisticsView.swift */,
 				073308B829F19B1F00756F60 /* TemperatureView.swift */,
 				073308BE29F19D5A00756F60 /* ValueBox.swift */,
+				07E160162BDC007A005EF1C0 /* PressureView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -187,7 +193,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1530;
 				ORGANIZATIONNAME = "ser.soft GmbH";
 				TargetAttributes = {
 					0733089429F1043E00756F60 = {
@@ -248,9 +254,11 @@
 				075A4E1829F5616C00830693 /* MeasurementDetailsView.swift in Sources */,
 				073308A829F1050400756F60 /* SensorMeasurement.swift in Sources */,
 				073308BB29F19C7600756F60 /* HumidityView.swift in Sources */,
+				07E160192BDC0B9A005EF1C0 /* PlottableMeasurement.swift in Sources */,
 				073308AA29F1054A00756F60 /* SensorMeasurementStatistics.swift in Sources */,
 				073308C729F27F2100756F60 /* Environment+Network.swift in Sources */,
 				073308B529F1991200756F60 /* FormatStyles.swift in Sources */,
+				07E160172BDC007A005EF1C0 /* PressureView.swift in Sources */,
 				073308C929F2CBE400756F60 /* LocationsList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -262,6 +270,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -294,6 +303,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -309,7 +319,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -324,6 +334,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -356,6 +367,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -365,7 +377,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = appletvos;
@@ -392,10 +404,12 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.sersoft.internship.Sensor-System";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -405,6 +419,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
 			name = Debug;
 		};
@@ -424,10 +439,12 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.sersoft.internship.Sensor-System";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -437,6 +454,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
 			name = Release;
 		};

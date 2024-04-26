@@ -28,7 +28,7 @@ struct LocationValuesView: View {
     @ViewBuilder
     private var content: some View {
 #if os(iOS)
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if case .pad = UIDevice.current.userInterfaceIdiom {
             HStack(alignment: .top, spacing: 130) {
                 latestAndAverageViews
             }
@@ -77,7 +77,7 @@ struct LocationValuesView: View {
     var body: some View {
         VStack {
 #if os(iOS)
-            if UIDevice.current.userInterfaceIdiom == .pad {
+            if case .pad = UIDevice.current.userInterfaceIdiom {
                 Spacer()
                 content
                     .padding()
@@ -161,10 +161,8 @@ struct LocationValuesView: View {
 }
 
 #if DEBUG
-struct LocationValuesView_Previews: PreviewProvider {
-    static var previews: some View {
-        LocationValuesView(locations: SensorMeasurement.previewLocations,
-                           selectedLocationName: nil)
-    }
+#Preview {
+    LocationValuesView(locations: SensorMeasurement.previewLocations,
+                       selectedLocationName: nil)
 }
 #endif

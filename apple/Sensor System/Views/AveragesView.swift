@@ -4,7 +4,7 @@ struct AveragesView: View {
     var statistics: SensorMeasurementStatistics
 
     var body: some View {
-        if statistics.averageTemperature != nil || statistics.averageHumidityPercent != nil {
+        if statistics.averageTemperature != nil || statistics.averageHumidityPercent != nil || statistics.averagePressure != nil {
             ValueBox(style: .group, "Average") {
                 if let temperature = statistics.averageTemperature {
                     ValueBox(style: .single, "Temperature") {
@@ -17,15 +17,18 @@ struct AveragesView: View {
                              format: .percent.precision(.fractionLength(0...2)))
                     }
                 }
+                if let pressure = statistics.averagePressure {
+                    ValueBox(style: .single, "Pressure") {
+                        Text(pressure, format: .pressure)
+                    }
+                }
             }
         }
     }
 }
 
 #if DEBUG
-struct AveragesView_Previews: PreviewProvider {
-    static var previews: some View {
-        AveragesView(statistics: .preview)
-    }
+#Preview {
+    AveragesView(statistics: .preview)
 }
 #endif

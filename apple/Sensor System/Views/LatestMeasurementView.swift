@@ -11,6 +11,8 @@ struct LatestMeasurementView: View {
                             showFeelsLike: true)
             HumidityView(measurement: measurement,
                          displayOptions: [])
+            PressureView(measurement: measurement,
+                         displayOptions: [])
         } footer: {
             Text(measurement.date, format: .fullDateTime)
             if showLocation {
@@ -24,10 +26,7 @@ struct LatestMeasurementView: View {
 }
 
 #if DEBUG
-struct LatestMeasurementView_Previews: PreviewProvider {
-    static var previews: some View {
-        LatestMeasurementView(measurement: .preview,
-                              showLocation: true)
-    }
+#Preview {
+    LatestMeasurementView(measurement: .preview, showLocation: true)
 }
 #endif

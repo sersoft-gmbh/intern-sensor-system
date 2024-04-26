@@ -16,7 +16,7 @@ struct SensorSystemApp: App {
             ContentView()
 #if os(tvOS) || os(iOS)
                 .onChange(of: scenePhase) {
-                    UIApplication.shared.isIdleTimerDisabled = $0 == .active
+                    UIApplication.shared.isIdleTimerDisabled = $1 == .active
                 }
 #endif
         }

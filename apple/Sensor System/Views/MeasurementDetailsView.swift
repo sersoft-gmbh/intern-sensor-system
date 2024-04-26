@@ -20,7 +20,7 @@ struct MeasurementDetailsView: View {
                                 dateSize = size
                             }
                             .onChange(of: $0.size) {
-                                dateSize = $0
+                                dateSize = $1
                             }
                     }
                 }
@@ -38,10 +38,8 @@ struct MeasurementDetailsView: View {
 }
 
 #if DEBUG
-struct MeasurementDetailsView_Previews: PreviewProvider {
-    static var previews: some View {
-        MeasurementDetailsView(measurement: .preview,
-                               displayOptions: [.showDate, .showLocation])
-    }
+#Preview {
+    MeasurementDetailsView(measurement: .preview,
+                           displayOptions: [.showDate, .showLocation])
 }
 #endif

@@ -221,13 +221,11 @@ extension ValueBox where Header == Text, Footer == Never {
 }
 
 #if DEBUG
-struct ValuesGroupView_Previews: PreviewProvider {
-    static var previews: some View {
-        ValueBox("Group Preview") {
-            Text("Group Content")
-        } footer: {
-            Text("Footer Preview")
-        }
+#Preview {
+    ValueBox("Group Preview") {
+        Text("Group Content")
+    } footer: {
+        Text("Footer Preview")
     }
 }
 #endif

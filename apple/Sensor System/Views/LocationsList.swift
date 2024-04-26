@@ -1,16 +1,6 @@
 import SwiftUI
 import Charts
 
-fileprivate extension ScaleType {
-    static var counts: Self {
-        if #available(iOS 16.4, tvOS 16.4, macOS 13.3, *) {
-            return .symmetricLog
-        } else {
-            return .linear
-        }
-    }
-}
-
 struct LocationsList: View {
     @Binding
     var locations: Array<Location>
@@ -79,7 +69,7 @@ struct LocationsList: View {
             }
             .chartForegroundStyleScale(domain: counts.perLocation.keys.sorted())
             .chartXAxis(.hidden)
-            .chartYScale(type: .counts)
+            .chartYScale(type: .symmetricLog)
             .frame(maxHeight: 275)
 #if !os(tvOS)
             .padding()
@@ -118,15 +108,15 @@ struct LocationsList: View {
             .focused($isFocused)
             .defaultFocus($focusedLocation, selectedLocation)
             .onChange(of: isFocused) {
-                guard $0 else { return }
+                guard $1 else { return }
                 focusedLocation = selectedLocation
             }
             .onChange(of: focusedLocation) {
-                guard $0 != nil else { return }
-                selectedLocation = $0
+                guard $1 != nil else { return }
+                selectedLocation = $1
             }
             .onChange(of: selectedLocation) {
-                focusedLocation = $0
+                focusedLocation = $1
             }
 #endif
             .refreshable {
@@ -207,3 +197,10 @@ struct LocationsList: View {
         }
     }
 }
+
+#if DEBUG
+#Preview {
+    LocationsList(locations: .constant([.all] + SensorMeasurement.previewLocations.map { .named($0) }),
+                  selectedLocation: .constant(nil))
+}
+#endif

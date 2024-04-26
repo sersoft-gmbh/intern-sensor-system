@@ -1,60 +1,66 @@
 import SwiftUI
 import Charts
 
-private struct _TemperatureCelsius: Plottable {
-    struct _FormatStyle: FormatStyle {
-        let formatStyle: Measurement<UnitTemperature>.FormatStyle
-
-        init(formatStyle: Measurement<UnitTemperature>.FormatStyle) {
-            self.formatStyle = formatStyle
-        }
-
-        init(from decoder: Decoder) throws {
-            formatStyle = try .init(from: decoder)
-        }
-
-        func encode(to encoder: Encoder) throws {
-            try formatStyle.encode(to: encoder)
-        }
-
-        func locale(_ locale: Locale) -> Self {
-            .init(formatStyle: formatStyle.locale(locale))
-        }
-
-        func format(_ value: _TemperatureCelsius) -> String {
-            formatStyle.format(value.measurement)
-        }
-    }
-
-    private let value: Double
-
-    var measurement: Measurement<UnitTemperature> {
-        .init(value: value, unit: .celsius)
-    }
-
-    var primitivePlottable: Double { value }
-
-    init(measurement: Measurement<UnitTemperature>) {
-        self.value = measurement.converted(to: .celsius).value
-    }
-
-    init?(primitivePlottable: Double) {
-        value = primitivePlottable
-    }
+fileprivate extension FormatStyle where Self == PlottableMeasurement<UnitTemperature>.FormatStyle {
+    static var temperature: Self { .init(formatStyle: .temperature) }
 }
 
-fileprivate extension Measurement<UnitTemperature> {
-    var celsius: _TemperatureCelsius { .init(measurement: self) }
-}
-
-fileprivate extension FormatStyle where Self == _TemperatureCelsius._FormatStyle {
-    static var temperatureCelsius: Self { .init(formatStyle: .temperature) }
+fileprivate extension FormatStyle where Self == PlottableMeasurement<UnitPressure>.FormatStyle {
+    static var pressure: Self { .init(formatStyle: .pressure) }
 }
 
 struct ChartsView: View {
+    private struct MeasurementChart<Value: Plottable, Format: FormatStyle>: View
+    where Format.FormatInput == Value, Format.FormatOutput == String
+    {
+        var measurements: Array<SensorMeasurement>
+
+        var title: Text
+        var valuePath: KeyPath<SensorMeasurement, Value>
+        var format: Format
+
+        var body: some View {
+            title.font(.title3)
+            Chart(measurements) { measurement in
+                LineMark(x: .value("Date & Time", measurement.date),
+                         y: .value("Temperature", measurement[keyPath: valuePath]),
+                         series: .value("Location", measurement.location))
+                .foregroundStyle(by: .value("Location", measurement.location))
+                PointMark(x: .value("Date & Time", measurement.date),
+                          y: .value("Temperature", measurement[keyPath: valuePath]))
+                .foregroundStyle(by: .value("Location", measurement.location))
+            }
+            .chartYAxis {
+                AxisMarks(format: format)
+            }
+            .frame(minHeight: 300)
+        }
+
+        init(measurements: Array<SensorMeasurement>,
+             title: Text,
+             valuePath: KeyPath<SensorMeasurement, Value>,
+             format: Format,
+             yRange: (minValue: Value, maxValue: Value)? = nil) {
+            self.measurements = measurements
+            self.title = title
+            self.valuePath = valuePath
+            self.format = format
+        }
+
+        init(measurements: Array<SensorMeasurement>,
+             title: Text,
+             valuePath: KeyPath<SensorMeasurement, Optional<Value>>,
+             format: Format) {
+            self.init(measurements: measurements.filter { $0[keyPath: valuePath] != nil },
+                      title: title,
+                      valuePath: valuePath.appending(path: \.self!),
+                      format: format)
+        }
+    }
+
     var locations: Array<String>
     var selectedLocationName: String?
-    
+
     @State
     private var measurements = Array<SensorMeasurement>()
 
@@ -69,46 +75,60 @@ struct ChartsView: View {
 #endif
     }
 
+    private var temperatureChart: some View {
+        MeasurementChart(measurements: measurements,
+                         title: Text("Temperature"),
+                         valuePath: \.temperature.plottable,
+                         format: .temperature)
+        .chartYScale(domain: PlottableMeasurement<UnitTemperature>(value: -30, unit: .celsius)...PlottableMeasurement(value: 60, unit: .celsius))
+    }
+
+    private var humidityChart: some View {
+        MeasurementChart(measurements: measurements,
+                         title: Text("Humidity"),
+                         valuePath: \.humidityPercent,
+                         format: .percent)
+        .chartYScale(domain: 0...1)
+    }
+
+    private var pressureChart: some View {
+        MeasurementChart(measurements: measurements,
+                         title: Text("Pressure"),
+                         valuePath: \.pressure?.plottable,
+                         format: .pressure)
+        .chartYScale(domain: PlottableMeasurement<UnitPressure>(value: 400, unit: .hectopascals)...PlottableMeasurement(value: 1200, unit: .hectopascals))
+    }
+
     var body: some View {
-        VStack(spacing: vStackSpacing) {
-            VStack {
-                Text("Temperature")
-                    .font(.title3)
-                Chart(measurements) { measurement in
-                    LineMark(x: .value("Date & Time", measurement.date),
-                             y: .value("Temperature", measurement.temperature.celsius),
-                             series: .value("Location", measurement.location))
-                    .foregroundStyle(by: .value("Location", measurement.location))
-                    PointMark(x: .value("Date & Time", measurement.date),
-                              y: .value("Temperature", measurement.temperature.celsius))
-                    .foregroundStyle(by: .value("Location", measurement.location))
-                }
-                .chartYAxis {
-                    AxisMarks(format: _TemperatureCelsius._FormatStyle.temperatureCelsius)
-                }
+        ScrollView {
+#if !os(tvOS)
+            LazyVStack(spacing: vStackSpacing) {
+                temperatureChart
+                humidityChart
+                pressureChart
             }
-            VStack {
-                Text("Humidity")
-                    .font(.title3)
-                Chart(measurements) { measurement in
-                    LineMark(x: .value("Date & Time", measurement.date),
-                             y: .value("Humidity", measurement.humidityPercent),
-                             series: .value("Location", measurement.location))
-                    .foregroundStyle(by: .value("Location", measurement.location))
-                    PointMark(x: .value("Date & Time", measurement.date),
-                              y: .value("Humidity", measurement.humidityPercent))
-                    .foregroundStyle(by: .value("Location", measurement.location))
-                }
-                .chartYAxis {
-                    AxisMarks(format: Decimal.FormatStyle.Percent.percent)
-                }
-            }
-        }
-        .chartForegroundStyleScale(domain: locations)
-        .padding()
+            .chartForegroundStyleScale(domain: locations)
+            .padding()
 #if os(macOS)
-        .frame(minWidth: 1000, minHeight: 350)
+            .frame(minWidth: 1000, minHeight: 350)
 #endif
+#else
+            HStack {
+                VStack {
+                    temperatureChart
+                }
+            }
+            HStack {
+                VStack {
+                    humidityChart
+                }
+                VStack {
+                    pressureChart
+                }
+            }
+            .chartForegroundStyleScale(domain: locations)
+#endif
+        }
         .animation(.default, value: measurements)
         .animation(.default, value: selectedLocationName)
         .periodicallyRefresh(frequency: .high, callInitially: false) {
@@ -138,10 +158,8 @@ struct ChartsView: View {
 }
 
 #if DEBUG
-struct ChartsView_Previews: PreviewProvider {
-    static var previews: some View {
-        ChartsView(locations: SensorMeasurement.previewLocations,
-                   selectedLocationName: nil)
-    }
+#Preview {
+    ChartsView(locations: SensorMeasurement.previewLocations,
+               selectedLocationName: nil)
 }
 #endif

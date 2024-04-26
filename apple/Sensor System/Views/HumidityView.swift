@@ -17,10 +17,8 @@ struct HumidityView: View {
 }
 
 #if DEBUG
-struct HumidityView_Previews: PreviewProvider {
-    static var previews: some View {
-        HumidityView(measurement: .preview,
-                     displayOptions: [.showDate, .showLocation])
-    }
+#Preview {
+    HumidityView(measurement: .preview,
+                 displayOptions: [.showDate, .showLocation])
 }
 #endif

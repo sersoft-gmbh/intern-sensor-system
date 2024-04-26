@@ -38,11 +38,9 @@ struct TemperatureView: View {
 }
 
 #if DEBUG
-struct TemperaturesView_Previews: PreviewProvider {
-    static var previews: some View {
-        TemperatureView(measurement: .preview,
-                        displayOptions: [.showDate, .showLocation],
-                        showFeelsLike: true)
-    }
+#Preview {
+    TemperatureView(measurement: .preview,
+                    displayOptions: [.showDate, .showLocation],
+                    showFeelsLike: true)
 }
 #endif

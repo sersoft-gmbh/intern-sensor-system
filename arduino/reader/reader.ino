@@ -3,6 +3,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoHttpClient.h>
+#include <IRremote.hpp>
 
 #include "time.h"
 #include "DHT.h"
@@ -15,22 +16,30 @@
 
 #define BTNPIN 5
 
+#define IRPIN 2
+
 #define REDPIN 16
 #define GREENPIN 14
 #define BLUEPIN 12
 
 #define READ_INTERVAL 1000
 
-const String locations[3] = {"Office Desk", "Living Room", "Bedroom"};
-volatile int locationIndex = 0;
+#define REQ_RES_LOGGING 0
 
+const String locations[3] = {"Office Desk", "Living Room", "Bedroom"};
+const int locationsCount = (sizeof(locations) / sizeof(String));
+
+volatile int locationIndex = 0;
+volatile bool locationIndexChanged = false;
+ 
 enum Color { red, green, blue };
 
 DHT dht(DHTPIN, DHT11);
-WiFiClientSecure wifi;
-HttpClient client = HttpClient(wifi, serverAddress, serverPort);
 
 X509List cert(cert_ISRG_Root_X1_CA);
+
+WiFiClientSecure wifi;
+HttpClient client = HttpClient(wifi, serverAddress, serverPort);
 
 void connectWifi() {
   WiFi.begin(wifiSSID, wifiPwd);
@@ -87,33 +96,122 @@ void setLEDColor(std::set<enum Color> colors) {
   digitalWrite(BLUEPIN, colors.find(blue) != colors.end() ? HIGH : LOW);
 }
 
+void changeLocationIndexBy(int diff) {
+  if (diff == 0) return;
+  changeLocationIndexTo(locationIndex + diff);
+}
+
+void changeLocationIndexTo(int newIndex) {
+  while (newIndex < 0 || newIndex >= locationsCount) {
+    if (newIndex >= locationsCount) {
+      newIndex -= locationsCount;
+    } else {
+      newIndex += locationsCount;
+    }
+  }
+  if (newIndex == locationIndex) return;
+  Serial.print("New Index: ");
+  Serial.println(newIndex);
+  locationIndex = newIndex;
+  locationIndexChanged = true;
+}
+
 double mticks() {
     struct timeval tv;
     gettimeofday(&tv, 0);
     return (double) tv.tv_usec / 1000 + tv.tv_sec * 1000;
 }
 
-volatile bool locationChanged = false;
 volatile double lastButtonMticks = mticks();
 IRAM_ATTR void buttonPressed() {
   auto currentMticks = mticks();
   auto difference = currentMticks - lastButtonMticks;
   lastButtonMticks = currentMticks;
   if (difference <= 500) return;
-  const int locationsEndIndex = (sizeof(locations) / sizeof(String)) - 1;
-  Serial.println("Switching Location...");
-  if (locationIndex == locationsEndIndex) {
-    locationIndex = 0;
-  } else {
-    locationIndex++;
+  Serial.println("Switching to next location...");
+  changeLocationIndexBy(1);
+}
+
+volatile double lastIrButtonMticks = mticks();
+IRAM_ATTR void irButtonPressed() {
+  if (!IrReceiver.decode()) return;
+  auto data = IrReceiver.decodedIRData;
+  IrReceiver.resume();
+
+  auto currentMticks = mticks();
+  auto difference = currentMticks - lastIrButtonMticks;
+  lastIrButtonMticks = currentMticks;
+  if (difference <= 500) return;
+
+  Serial.println(data.protocol);
+  switch (data.command) {
+    // A
+    case 69: break;
+    // Arrow Up
+    case 70: 
+      Serial.println("Switching to next location...");
+      changeLocationIndexBy(1);
+      break;
+    // B
+    case 71: break;
+    // Arrow Left
+    case 68: 
+      Serial.println("Switching to previous location...");
+      changeLocationIndexBy(-1);
+      break;
+    // X
+    case 64: break;
+    // Arrow Right
+    case 67: 
+      Serial.println("Switching to next location...");
+      changeLocationIndexBy(1);
+      break;
+    // 0
+    case 7: break;
+    // Arrow Down
+    case 21:
+      Serial.println("Switching to previous location...");
+      changeLocationIndexBy(-1);
+      break;
+    // C
+    case 9: break;
+    // 1
+    case 22:
+      Serial.println("Switching to first location...");
+      changeLocationIndexTo(0);
+      break;
+    // 2
+    case 25: 
+      Serial.println("Switching to second location...");
+      changeLocationIndexTo(1);
+      break;
+    // 3
+    case 13: 
+      Serial.println("Switching to third location...");
+      changeLocationIndexTo(2);
+      break;
+    // 4
+    case 12: break;
+    // 5
+    case 24: break;
+    // 6
+    case 94: break;
+    // 7
+    case 8: break;
+    // 8
+    case 28: break;
+    // 9
+    case 90: break;
+    // Invalid
+    default: break;
   }
-  locationChanged = true;
 }
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   dht.begin();
+  IrReceiver.begin(IRPIN);
 
   pinMode(BTNPIN, INPUT_PULLUP);
   initLED(REDPIN);
@@ -122,6 +220,7 @@ void setup() {
   setLEDColor({blue});
 
   attachInterrupt(digitalPinToInterrupt(BTNPIN), buttonPressed, FALLING);
+  IrReceiver.registerReceiveCompleteCallback(irButtonPressed);
 
   connectWifi();
   setupTime();
@@ -151,7 +250,8 @@ void loop() {
   char curDate[sizeof "yyyy-MM-ddThh:mm:ssZ"];
   strftime(curDate, sizeof curDate, "%FT%TZ", gmtime(&now));
 
-  if (locationChanged) {
+  if (locationIndexChanged) {
+    locationIndexChanged = false;
     setLEDColor({red, green, blue});
     delay(500);
     setLEDColor({});
@@ -159,7 +259,6 @@ void loop() {
     setLEDColor({red, green, blue});
     delay(500);
     setLEDColor({red, blue});
-    locationChanged = false;
   }
 
   String body = "{";
@@ -172,8 +271,10 @@ void loop() {
   body += "\"humidityPercent\":" + String(humidity / 100, 10);
   body += "}";
 
+#if REQ_RES_LOGGING
   Serial.print("Request: "); 
   Serial.println(body);
+#endif
 
   client.beginRequest();
   auto errorMessage = httpErrorMessage(client.put("/measurements"), false);
@@ -190,8 +291,10 @@ void loop() {
   client.endRequest();
 
   auto statusCode = client.responseStatusCode();
+#if REQ_RES_LOGGING
   Serial.print("Status code: ");
   Serial.println(statusCode);
+#endif
   errorMessage = httpErrorMessage(statusCode, true);
   if (!errorMessage.isEmpty()) {
     setLEDColor({red});
@@ -205,7 +308,9 @@ void loop() {
     setLEDColor({green});
   }
 
+#if REQ_RES_LOGGING
   auto response = client.responseBody();
   Serial.print("Response: ");
   Serial.println(response);
+#endif
 }

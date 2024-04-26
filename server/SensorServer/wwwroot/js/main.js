@@ -76,7 +76,9 @@ async function getLatestMeasurementElement(currentLocation) {
     content.fillElementWithId(
         'latest-pressure-hectopascals',
         'hectopascals',
-        latestMeasurement.pressureHectopascals);
+        latestMeasurement.pressureHectopascals,
+        true,
+        'latest-pressure-hectopascals-container');
 
     return content;
 }
@@ -133,7 +135,9 @@ async function getStatisticsMeasurementElements(currentLocation) {
         content.fillElementWithId(
             'stats-pressure-hectopascals',
             'hectopascals',
-            pressureMeasurement?.pressureHectopascals);
+            pressureMeasurement?.pressureHectopascals,
+            true,
+            'stats-pressure-hectopascals-container');
 
         return content;
     }
@@ -151,7 +155,9 @@ async function getStatisticsMeasurementElements(currentLocation) {
         content.fillElementWithId(
             'avg-stats-pressure',
             'hectopascals',
-            statistics.averagePressureHectopascals);
+            statistics.averagePressureHectopascals,
+            true,
+            'avg-stats-pressure-container');
         return content;
     }
 

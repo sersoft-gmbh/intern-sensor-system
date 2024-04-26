@@ -28,16 +28,21 @@ function deepEqual(x, y) {
      * @param {'string'|'date'|'temperatureCelsius'|'percentage'|'temperatureFahrenheit'|'hectopascals'} valueType
      * @param {string|number|Date|null|undefined} value
      * @param {boolean} removeIfNoValue
+     * @param {string|null|undefined} containerElementIdToRemove
      * @return {HTMLElement}
      */
-    Element.prototype.fillElementWithId = function (
+    Node.prototype.fillElementWithId = function (
         id, 
         valueType, 
         value, 
-        removeIfNoValue = true) {
+        removeIfNoValue = true,
+        containerElementIdToRemove = undefined) {
         const element = this.querySelector('#' + id);
         if (!value && removeIfNoValue) {
-            element.remove();
+            if (containerElementIdToRemove)
+                this.querySelector('#' + containerElementIdToRemove).remove();
+            else
+                element.remove();
             return element;
         }
         

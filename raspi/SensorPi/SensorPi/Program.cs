@@ -17,7 +17,7 @@ const int LedGPin = 22;
 const int LedBPin = 27;
 const int I2CBus = 1;
 const int DisplayAddress = 0x27;
-const int Bme680Address = 0x77;
+const int BmeAddress = 0x77;
 
 const string IrRemoteName = "funduino";
 
@@ -26,8 +26,7 @@ using var gpioController = new GpioController();
 using var display = new WideDisplay(I2CBus, DisplayAddress);
 using var statusLight = new StatusLight(LedRPin, LedGPin, LedBPin, gpioController, false);
 
-// using var temperatureSensor = new SimpleTemperatureSensor(DhtPin, gpioController);
-using var temperatureSensor = new AdvancedTemperatureSensor(I2CBus, Bme680Address);
+using var temperatureSensor = new AdvancedTemperatureSensor(I2CBus, BmeAddress);
 
 var locationsController = new LocationsController(display);
 var nightModeController = new NightModeController(display, statusLight);

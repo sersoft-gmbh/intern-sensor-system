@@ -10,7 +10,7 @@ public sealed class SimpleTemperatureSensor : ITemperatureSensor {
 
     private readonly Dht11 _dht;
    
-    private DateTime lastRead = DateTime.MinValue;
+    private DateTime _lastRead = DateTime.MinValue;
 
     public SimpleTemperatureSensor(int pin, GpioController? gpioController = null)
     {
@@ -29,11 +29,11 @@ public sealed class SimpleTemperatureSensor : ITemperatureSensor {
     private TemperatureValues? ReadCurrentSync() {
         var now = DateTime.Now;
         lock(_dht) {
-            if (now.Subtract(lastRead) < ReadDelay)
+            if (now.Subtract(_lastRead) < ReadDelay)
                 return null;
-            lastRead = now;
+            _lastRead = now;
             if (_dht.TryReadTemperature(out var temp) && _dht.TryReadHumidity(out var humidity))
-                return new TemperatureValues(now, temp, humidity);
+                return new TemperatureValues(now, temp, humidity, null);
         }
         return null;
     }

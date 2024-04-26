@@ -44,7 +44,8 @@ where TTemperatureSensor : ITemperatureSensor
             current.Value.Date, 
             locationsController.GetCurrentLocation(),
             current.Value.Temperature.DegreesCelsius, 
-            current.Value.Humidity.Percent / 100);
+            current.Value.Humidity.Percent / 100,
+            current.Value.Pressure?.Hectopascals);
         if (_display != null)
             await _display.WriteMeasurement(measurement);
 

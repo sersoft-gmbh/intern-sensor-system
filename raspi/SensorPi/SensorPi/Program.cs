@@ -9,7 +9,6 @@ using SensorPi.Controllers;
 const string ServerAddress = "CHANGEME";
 const string ServerToken = "CHANGEME";
 
-// const int DhtPin = 18;
 const int LocationButtonPin = 16;
 const int DarkModeButtonPin = 12;
 const int LedRPin = 17;

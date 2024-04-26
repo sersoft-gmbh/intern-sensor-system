@@ -60,6 +60,8 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+Console.WriteLine("alles kaputt!");
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

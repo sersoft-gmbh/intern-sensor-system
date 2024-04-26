@@ -11,7 +11,6 @@ function deepEqual(x, y) {
 
 (() => {
     /**
-     * @this Node
      * @param newContent {Element}
      */
     Node.prototype.replaceContent = function (newContent) {
@@ -20,23 +19,23 @@ function deepEqual(x, y) {
         }
         this.appendChild(newContent);
     };
-    /**
-     * @this Node
-     */
-    Node.prototype.removeId = function () {
+    Element.prototype.removeId = function () {
         this.attributes.removeNamedItem("id");
     };
 
     /**
-     * @this Node
      * @param {string} id
-     * @param {'string'|'date'|'temperatureCelsius'|'percentage' |'temperatureFahrenheit' | 'hectopascals'} valueType
-     * @param {string|number|Date} value
+     * @param {'string'|'date'|'temperatureCelsius'|'percentage'|'temperatureFahrenheit'|'hectopascals'} valueType
+     * @param {string|number|Date|null|undefined} value
      * @param {boolean} removeIfNoValue
      * @return {HTMLElement}
      */
-    Node.prototype.fillElementWithId = function (id, valueType, value, removeIfNoValue = true) {
-        const element = this.getElementById(id);
+    Element.prototype.fillElementWithId = function (
+        id, 
+        valueType, 
+        value, 
+        removeIfNoValue = true) {
+        const element = this.querySelector('#' + id);
         if (!value && removeIfNoValue) {
             element.remove();
             return element;

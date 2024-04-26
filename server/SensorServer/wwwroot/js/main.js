@@ -55,7 +55,7 @@ async function getLatestMeasurementElement(currentLocation) {
         " at " + latestMeasurement.location,
         false);
     if (currentLocation && currentLocation.length >= 0) {
-        locationElm.parentElement.removeChild(locationElm);
+        locationElm.remove();
     }
 
     content.fillElementWithId(

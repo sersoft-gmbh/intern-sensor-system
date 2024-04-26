@@ -17,7 +17,8 @@ async function getLocationsListElement(locations, currentLocation, updateLocatio
         const currentLocationElement = currentLocationContent.fillElementWithId(
             "location-name",
             'string',
-            location);
+            location,
+            false);
 
         if (location === currentLocation) {
             currentLocationElement.classList.add("active");
@@ -51,7 +52,8 @@ async function getLatestMeasurementElement(currentLocation) {
     const locationElm = content.fillElementWithId(
         'latest-location',
         'string',
-        " at " + latestMeasurement.location);
+        " at " + latestMeasurement.location,
+        false);
     if (currentLocation && currentLocation.length >= 0) {
         locationElm.parentElement.removeChild(locationElm);
     }
@@ -71,6 +73,11 @@ async function getLatestMeasurementElement(currentLocation) {
         'temperatureFahrenheit',
         latestMeasurement.temperatureFahrenheit);
 
+    content.fillElementWithId(
+        'latest-pressure-hectopascals',
+        'hectopascals',
+        latestMeasurement.pressureHectopascals);
+
     return content;
 }
 
@@ -81,10 +88,11 @@ async function getStatisticsMeasurementElements(currentLocation) {
     /**
      * @param {Measurement | null} temperatureMeasurement
      * @param {Measurement | null} humidityMeasurement
+     * @param {Measurement | null} pressureMeasurement
      * @param {string} header
      * @return {Node}
      */
-    function createElementForMeasurement(temperatureMeasurement, humidityMeasurement, header) {
+    function createElementForMeasurement(temperatureMeasurement, humidityMeasurement, pressureMeasurement, header) {
         const content = document.getElementById("tmpl-statistics").content.cloneNode(true);
 
         content.fillElementWithId(
@@ -96,6 +104,11 @@ async function getStatisticsMeasurementElements(currentLocation) {
             'stats-humidity-date',
             'date',
             humidityMeasurement?.date);
+        
+        content.fillElementWithId(
+            'stats-pressure-date',
+            'date',
+            pressureMeasurement?.date);
 
         content.fillElementWithId(
             'stats-header',
@@ -117,6 +130,11 @@ async function getStatisticsMeasurementElements(currentLocation) {
             'temperatureCelsius',
             temperatureMeasurement?.heatIndexCelsius);
 
+        content.fillElementWithId(
+            'stats-pressure-hectopascals',
+            'hectopascals',
+            pressureMeasurement?.pressureHectopascals);
+
         return content;
     }
 
@@ -130,14 +148,18 @@ async function getStatisticsMeasurementElements(currentLocation) {
             'avg-stats-humidity',
             'percentage',
             statistics.averageHumidityPercent);
+        content.fillElementWithId(
+            'avg-stats-pressure',
+            'hectopascals',
+            statistics.averagePressureHectopascals);
         return content;
     }
 
     const statistics = await fetchMeasurementStatistics(currentLocation);
     return {
-        min: createElementForMeasurement(statistics.minTemperature, statistics.minHumidity, "min"),
-        max: createElementForMeasurement(statistics.maxTemperature, statistics.maxHumidity, "max"),
-        median: createElementForMeasurement(statistics.medianTemperature, statistics.medianHumidity, "median"),
+        min: createElementForMeasurement(statistics.minTemperature, statistics.minHumidity, statistics.minPressure, "min"),
+        max: createElementForMeasurement(statistics.maxTemperature, statistics.maxHumidity, statistics.maxPressure, "max"),
+        median: createElementForMeasurement(statistics.medianTemperature, statistics.medianHumidity, statistics.medianPressure, "median"),
         averages: createAverageElement(),
     };
 }

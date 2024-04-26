@@ -9,6 +9,7 @@
  * @property {number} temperatureCelsius
  * @property {number} temperatureFahrenheit
  * @property {number} humidityPercent
+ * @property {number} pressureHectopascals
  * @property {number} heatIndexFahrenheit
  * @property {number} heatIndexCelsius
  */
@@ -18,12 +19,16 @@
  * @type {object}
  * @property {number} averageTemperatureCelsius
  * @property {number} averageHumidityPercent
+ * @property {number} averagePressureHectopascals
  * @property {Measurement | null} minTemperature
  * @property {Measurement | null} maxTemperature
  * @property {Measurement | null} minHumidity
  * @property {Measurement | null} maxHumidity
+ * @property {Measurement | null} minPressure
+ * @property {Measurement | null} maxPressure
  * @property {Measurement | null} medianTemperature
  * @property {Measurement | null} medianHumidity
+ * @property {Measurement | null} medianPressure
  */
 
 const serverAddress = window.location;

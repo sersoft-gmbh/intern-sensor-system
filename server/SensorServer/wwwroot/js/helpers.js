@@ -10,31 +10,45 @@ function deepEqual(x, y) {
 }
 
 (() => {
+    /**
+     * @this Node
+     * @param newContent {Element}
+     */
     Node.prototype.replaceContent = function (newContent) {
         while (this.firstChild) {
             this.removeChild(this.lastChild);
         }
         this.appendChild(newContent);
     };
+    /**
+     * @this Node
+     */
     Node.prototype.removeId = function () {
         this.attributes.removeNamedItem("id");
     };
 
     /**
+     * @this Node
      * @param {string} id
-     * @param {'string'|'date'|'temperatureCelsius'|'percentage' |'temperatureFahrenheit'} valueType
+     * @param {'string'|'date'|'temperatureCelsius'|'percentage' |'temperatureFahrenheit' | 'hectopascals'} valueType
      * @param {string|number|Date} value
+     * @param {boolean} removeIfNoValue
      * @return {HTMLElement}
      */
-    Node.prototype.fillElementWithId = function (id, valueType, value) {
+    Node.prototype.fillElementWithId = function (id, valueType, value, removeIfNoValue = true) {
         const element = this.getElementById(id);
+        if (!value && removeIfNoValue) {
+            element.remove();
+            return element;
+        }
+        
         element.removeId();
         switch (valueType) {
             case 'string':
                 element.innerText = value;
                 break;
             case 'date':
-                element.innerText = luxon.DateTime.fromISO(value).toLocaleString(luxon.DateTime.DATETIME_SHORT_WITH_SECONDS);
+                element.innerText = value ? luxon.DateTime.fromISO(value).toLocaleString(luxon.DateTime.DATETIME_SHORT_WITH_SECONDS) : 'N/A';
                 break;
             case 'temperatureCelsius':
                 element.innerText = celsiusFormatter.format(value);
@@ -44,6 +58,9 @@ function deepEqual(x, y) {
                 break;
             case 'percentage':
                 element.innerText = percentageFormatter.format(value);
+                break;
+            case 'hectopascals':
+                element.innerText = value ? hectopascalsFormatter.format(value) + ' hP' : 'N/A';
                 break;
             default:
                 console.error('Unsupported value type', valueType);

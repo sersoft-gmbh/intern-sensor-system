@@ -98,22 +98,30 @@ public sealed class MeasurementsRepository(IConfiguration configuration, ILogger
         var medianSkip = (int)(count / 2);
         var averageTemperatureCelsius = filtered.TagWith("Average Temperature").AverageAsync(m => m.TemperatureCelsius);
         var averageHumidityPercent = filtered.TagWith("Average Humidity").AverageAsync(m => m.HumidityPercent);
+        var averagePressureHectopascals = filtered.TagWith("Average Pressure").AverageAsync(m => m.PressureHectopascals);
         var minTemperature = filtered.TagWith("Min Temperature").OrderBy(m => m.TemperatureCelsius).FirstOrDefaultAsync();
         var maxTemperature = filtered.TagWith("Max Temperature").OrderByDescending(m => m.TemperatureCelsius).FirstOrDefaultAsync();
         var minHumidity = filtered.TagWith("Min Humidity").OrderBy(m => m.HumidityPercent).FirstOrDefaultAsync();
-        var maxHumidity = filtered.TagWith("MaxHumidity").OrderByDescending(m => m.HumidityPercent).FirstOrDefaultAsync();
+        var maxHumidity = filtered.TagWith("Max Humidity").OrderByDescending(m => m.HumidityPercent).FirstOrDefaultAsync();
+        var minPressure = filtered.TagWith("Min Pressure").OrderBy(m => m.PressureHectopascals).FirstOrDefaultAsync();
+        var maxPressure = filtered.TagWith("Max Pressure").OrderByDescending(m => m.PressureHectopascals).FirstOrDefaultAsync();
         var medianTemperature = filtered.TagWith("Median Temperature").OrderBy(m => m.TemperatureCelsius).Skip(medianSkip).FirstOrDefaultAsync();
         var medianHumidity = filtered.TagWith("Median Humidity").OrderBy(m => m.HumidityPercent).Skip(medianSkip).FirstOrDefaultAsync();
+        var medianPressure = filtered.TagWith("Median Pressure").OrderBy(m => m.PressureHectopascals).Skip(medianSkip).FirstOrDefaultAsync();
         return new MeasurementStatistics
         {
             AverageTemperatureCelsius = await averageTemperatureCelsius,
             AverageHumidityPercent = await averageHumidityPercent,
+            AveragePressureHectopascals = await averagePressureHectopascals,
             MinTemperature = await minTemperature,
             MaxTemperature = await maxTemperature,
             MinHumidity = await minHumidity,
             MaxHumidity = await maxHumidity,
+            MinPressure = await minPressure,
+            MaxPressure = await maxPressure,
             MedianTemperature = await medianTemperature,
             MedianHumidity = await medianHumidity,
+            MedianPressure = await medianPressure,
         };
     }
 

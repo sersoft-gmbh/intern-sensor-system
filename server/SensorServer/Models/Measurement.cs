@@ -18,6 +18,9 @@ public sealed class Measurement
     public double TemperatureFahrenheit => TemperatureCelsius.ToFahrenheit();
     [Range(0, 1)]
     public double HumidityPercent { get; set; }
+    
+    [Range(1, 1200)]
+    public double? PressureHectopascals { get; set; }
 
     public double HeatIndexFahrenheit => this.CalculateHeatIndexInFahrenheit();
     public double HeatIndexCelsius => HeatIndexFahrenheit.ToCelsius();

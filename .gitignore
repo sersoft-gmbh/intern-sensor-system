@@ -3,10 +3,13 @@
 server/*.exe
 server/**/[Bb]in/
 server/**/[Oo]bj/
+server/.vs
+
 server/data/*.sqlite*
 
 raspi/*.exe
 raspi/**/[Bb]in/
 raspi/**/[Oo]bj/
+raspi/.vs
 
 *.[Dd]ot[Ss]ettinsg.user

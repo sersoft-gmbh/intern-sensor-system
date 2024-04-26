@@ -133,7 +133,7 @@ jobs:
           JSON_PAYLOAD="$(echo -n "${TAGS}" | jq --raw-input --slurp --raw-output --compact-output '
             split(" |\n"; null)
             | map(split(":") | select(length >= 2))
-            | reduce .[] as $i (null; .[($i[0])] += [($i[1:] | join(":"))])
+            | reduce .[] as $i (null; .[($i[0] | split("/") | .[1:] | join("/"))] += [($i[1:] | join(":"))])
             | to_entries
             | map({"image": .key, "tags": .value})')"
           echo "payload=${JSON_PAYLOAD}" >> "${GITHUB_OUTPUT}"

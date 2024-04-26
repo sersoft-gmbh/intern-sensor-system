@@ -116,7 +116,12 @@ public sealed class WideDisplay : IDisposable {
         await HideActivityIndicator();
         await Task.Run(() => {
             WriteTextAtLine(0, measurement.Location);
-            WriteTextAtLine(1, $"{measurement.TemperatureCelsius:N2}C | {measurement.HumidityPercent:P2}");
+            string measurementLine;
+            if (measurement.PressureHectopascals is {} pressure)
+                measurementLine = $"{measurement.TemperatureCelsius:N0}C  {measurement.HumidityPercent:P0}  {pressure:N0}hP";
+            else
+                measurementLine = $"{measurement.TemperatureCelsius:N2}C | {measurement.HumidityPercent:P2}";
+            WriteTextAtLine(1, measurementLine);
         });
     }
 

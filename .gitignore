@@ -8,3 +8,5 @@ server/data/*.sqlite*
 raspi/*.exe
 raspi/**/[Bb]in/
 raspi/**/[Oo]bj/
+
+*.[Dd]ot[Ss]ettinsg.user

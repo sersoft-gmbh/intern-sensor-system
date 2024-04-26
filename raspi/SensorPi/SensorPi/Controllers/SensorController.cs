@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using SensorPi.Accessories;
 using SensorPi.Accessories.Temperature;
 using SensorPi.Models;
@@ -49,12 +50,13 @@ where TTemperatureSensor : ITemperatureSensor
         if (_display != null)
             await _display.WriteMeasurement(measurement);
 
-        if(measurement.TemperatureCelsius > 150 || measurement.TemperatureCelsius < -30)
+        var results = new List<ValidationResult>();
+        if (!Validator.TryValidateObject(measurement, new ValidationContext(measurement, null, null), results, true))
         {
             await SetColor(LedColor.Red);
             return;
         }
-             // Send measurement to server.
+        // Send measurement to server.
         try {
             await server.SendMeasurement(measurement);
             // Set LED to green

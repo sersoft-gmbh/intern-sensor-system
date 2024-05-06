@@ -10,7 +10,7 @@ using SensorServer.Repositories;
 
 namespace SensorServer.Migrations
 {
-    [DbContext(typeof(MeasurementsRepository))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20230710135353_AddIndexToMigrationsDateAndLocation")]
     partial class AddIndexToMigrationsDateAndLocation
     {

@@ -2,12 +2,15 @@ using System.Text.RegularExpressions;
 
 namespace SensorServer.Helpers;
 
-public sealed class SlugifyParameterTransformer : IOutboundParameterTransformer
+public sealed partial class SlugifyParameterTransformer : IOutboundParameterTransformer
 {
+    [GeneratedRegex("([a-z])([A-Z])")]
+    private static partial Regex ParameterSlug();
+
     public string? TransformOutbound(object? value)
     {
         if (value == null) return null;
         var stringValue = value.ToString();
-        return stringValue == null ? null : Regex.Replace(stringValue, "([a-z])([A-Z])", "$1-$2").ToLower();
+        return stringValue == null ? null : ParameterSlug().Replace(stringValue, "$1-$2").ToLower();
     }
 }

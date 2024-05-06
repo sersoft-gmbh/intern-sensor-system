@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using SensorServer;
 using SensorServer.Helpers;
 using SensorServer.Repositories;
 
@@ -8,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddEntityFrameworkSqlite();
-builder.Services.AddDbContext<MeasurementsRepository>();
+builder.Services.AddDbContextFactory<ApplicationDbContext>();
+builder.Services.AddScoped<MeasurementsRepository>();
 
 builder.Services.AddHttpLogging(_ => {});
 
@@ -62,9 +64,12 @@ builder.Services.AddSwaggerGen(option =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+await using (var scope = app.Services.CreateAsyncScope())
 {
-    scope.ServiceProvider.GetRequiredService<MeasurementsRepository>().Database.Migrate();
+    await using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
+    {
+        await dbContext.Database.MigrateAsync();
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -82,4 +87,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

@@ -5,20 +5,10 @@ namespace SensorServer.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public sealed class LocationsController : ControllerBase
+public sealed class LocationsController(MeasurementsRepository measurementsRepository, ILogger<LocationsController> logger) : ControllerBase
 {
-    private readonly MeasurementsRepository _measurementsRepository;
-    private readonly ILogger<LocationsController> _logger;
-
-    public LocationsController(MeasurementsRepository measurementsRepository, ILogger<LocationsController> logger)
-    {
-        _measurementsRepository = measurementsRepository;
-        _logger = logger;
-    }
+    private readonly ILogger<LocationsController> _logger = logger;
 
     [HttpGet]
-    public async Task<string[]> GetLocations()
-    {
-        return await _measurementsRepository.AllLocations();
-    }
+    public IAsyncEnumerable<string> GetLocations() => measurementsRepository.AllLocations();
 }

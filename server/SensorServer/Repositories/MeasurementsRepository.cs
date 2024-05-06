@@ -1,34 +1,18 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using SensorServer.Models;
 
 namespace SensorServer.Repositories;
 
-public sealed class MeasurementsRepository(IConfiguration configuration, ILogger<MeasurementsRepository> logger) : DbContext
+public sealed class MeasurementsRepository(
+    ApplicationDbContext dbContext,
+    IDbContextFactory<ApplicationDbContext> dbContextFactory
+)
 {
-    private static ILoggerFactory ContextLoggerFactory
-        => LoggerFactory.Create(b => b.AddConsole().AddFilter("", LogLevel.Information));
-    private static bool _didLogConnectionString;
+    public IAsyncEnumerable<string> AllLocations()
+        => dbContext.Measurements.TagWith(nameof(AllLocations)).Select(m => m.Location).Distinct().AsAsyncEnumerable();
 
-    public DbSet<Measurement> Measurements { get; set; } = null!;
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        if (!_didLogConnectionString)
-        {
-            logger.LogInformation("Using database connection string: {ConnectionString}", connectionString);
-            _didLogConnectionString = true;
-        }
-
-        optionsBuilder.UseSqlite(connectionString).UseLoggerFactory(ContextLoggerFactory);
-    }
-
-    public async Task<string[]> AllLocations()
-    {
-        return await Measurements.TagWith(nameof(AllLocations)).Select(m => m.Location).Distinct().ToArrayAsync();
-    }
-
-    public async Task<Measurement[]> AllMeasurements(
+    public IAsyncEnumerable<Measurement> AllMeasurements(
         SortDirection sortDirection,
         int count,
         int skip = 0,
@@ -36,7 +20,8 @@ public sealed class MeasurementsRepository(IConfiguration configuration, ILogger
         DateTime? start = null,
         DateTime? stop = null)
     {
-        var filtered = FilteredMeasurements(location, start, stop).TagWith(nameof(AllMeasurements));
+        var filtered = FilteredMeasurements(dbContext.Measurements.AsNoTracking(), location, start, stop)
+            .TagWith(nameof(AllMeasurements));
         switch (sortDirection)
         {
             case SortDirection.Ascending:
@@ -48,20 +33,18 @@ public sealed class MeasurementsRepository(IConfiguration configuration, ILogger
             default:
                 throw new ArgumentOutOfRangeException(nameof(sortDirection), sortDirection, null);
         }
-        return await filtered
-            .Skip(skip)
-            .Take(count)
-            .ToArrayAsync();
+
+        return filtered.Skip(skip).Take(count).AsAsyncEnumerable();
     }
 
     public async Task<Measurement?> GetMeasurement(long id)
     {
-        return await Measurements.FindAsync(id);
+        return await dbContext.Measurements.FindAsync(id);
     }
 
     public async Task<Measurement?> GetLatestMeasurement(string? location)
     {
-        return await FilteredMeasurements(location, null, null)
+        return await FilteredMeasurements(dbContext.Measurements.AsNoTracking(), location, null, null)
             .TagWith(nameof(GetLatestMeasurement))
             .OrderByDescending(m => m.Date)
             .FirstOrDefaultAsync();
@@ -69,20 +52,20 @@ public sealed class MeasurementsRepository(IConfiguration configuration, ILogger
 
     public async Task<MeasurementCounts> GetMeasurementCounts(DateTime? start = null, DateTime? stop = null)
     {
-        var measurements = FilteredMeasurements(null, start, stop)
+        var measurements = FilteredMeasurements(dbContext.Measurements.AsNoTracking(), null, start, stop)
             .TagWith(nameof(GetMeasurementCounts));
-        var total = measurements
+        var total = await measurements
             .TagWith("Total")
             .LongCountAsync();
-        var perLocation = measurements
+        var perLocation = await measurements
             .TagWith("Per Location")
             .GroupBy(m => m.Location)
-            .Select(x => new {Location = x.Key, Count = x.LongCount()})
+            .Select(x => new { Location = x.Key, Count = x.LongCount() })
             .ToDictionaryAsync(g => g.Location, g => g.Count);
         return new MeasurementCounts
         {
-            Total = await total,
-            PerLocation = await perLocation,
+            Total = total,
+            PerLocation = perLocation,
         };
     }
 
@@ -91,55 +74,61 @@ public sealed class MeasurementsRepository(IConfiguration configuration, ILogger
         DateTime? start = null,
         DateTime? stop = null)
     {
-        var filtered = FilteredMeasurements(location, start, stop)
-            .TagWith(nameof(GetMeasurementStatistics));
-        var filteredWithPressure = filtered.Where(m => m.PressureHectopascals != null);
-        var count = await filtered.TagWith("Total").LongCountAsync();
-        if (count == 0) return new MeasurementStatistics();
-        var countWithPressure = await filteredWithPressure.TagWith("Total with Pressure").LongCountAsync();
-        var medianSkip = (int)(count / 2);
-        var medianPressureSkip = (int)(countWithPressure / 2);
-        var averageTemperatureCelsius = filtered.TagWith("Average Temperature").AverageAsync(m => m.TemperatureCelsius);
-        var averageHumidityPercent = filtered.TagWith("Average Humidity").AverageAsync(m => m.HumidityPercent);
-        var averagePressureHectopascals = filteredWithPressure.TagWith("Average Pressure").AverageAsync(m => m.PressureHectopascals);
-        var minTemperature = filtered.TagWith("Min Temperature").OrderBy(m => m.TemperatureCelsius).FirstOrDefaultAsync();
-        var maxTemperature = filtered.TagWith("Max Temperature").OrderByDescending(m => m.TemperatureCelsius).FirstOrDefaultAsync();
-        var minHumidity = filtered.TagWith("Min Humidity").OrderBy(m => m.HumidityPercent).FirstOrDefaultAsync();
-        var maxHumidity = filtered.TagWith("Max Humidity").OrderByDescending(m => m.HumidityPercent).FirstOrDefaultAsync();
-        var minPressure = filteredWithPressure.TagWith("Min Pressure").OrderBy(m => m.PressureHectopascals).FirstOrDefaultAsync();
-        var maxPressure = filteredWithPressure.TagWith("Max Pressure").OrderByDescending(m => m.PressureHectopascals).FirstOrDefaultAsync();
-        var medianTemperature = filtered.TagWith("Median Temperature").OrderBy(m => m.TemperatureCelsius).Skip(medianSkip).FirstOrDefaultAsync();
-        var medianHumidity = filtered.TagWith("Median Humidity").OrderBy(m => m.HumidityPercent).Skip(medianSkip).FirstOrDefaultAsync();
-        var medianPressure = filteredWithPressure.TagWith("Median Pressure").OrderBy(m => m.PressureHectopascals).Skip(medianPressureSkip).FirstOrDefaultAsync();
+        long count, countWithPressure;
+        await using (var context = await dbContextFactory.CreateDbContextAsync())
+        {
+            var filtered = FilteredMeasurements(context.Measurements.AsNoTracking(), location, start, stop)
+                .TagWith(nameof(GetMeasurementStatistics));
+            count = await filtered.TagWith("Total").LongCountAsync();
+            if (count == 0) return new MeasurementStatistics();
+            countWithPressure = await filtered.Where(m => m.PressureHectopascals != null).TagWith("Total with Pressure").LongCountAsync();
+        }
+
+        var averageTemperatureCelsius = AverageMeasurementField(m => m.TemperatureCelsius, "Temperature", location, start, stop);
+        var averageHumidityPercent = AverageMeasurementField(m => m.HumidityPercent, "Humidity", location, start, stop);
+        var averagePressureHectopascals = AverageMeasurementField(m => m.PressureHectopascals, "Pressure", location, start, stop);
+        var minTemperature = StatisticsMeasurement(m => m.TemperatureCelsius, "Temperature", StatisticKind.Min, count, location, start, stop);
+        var maxTemperature = StatisticsMeasurement(m => m.TemperatureCelsius, "Temperature", StatisticKind.Max, count, location, start, stop);
+        var medianTemperature = StatisticsMeasurement(m => m.TemperatureCelsius, "Temperature", StatisticKind.Median, count, location, start, stop);
+        var minHumidity = StatisticsMeasurement(m => m.HumidityPercent, "Humidity", StatisticKind.Min, count, location, start, stop);
+        var maxHumidity = StatisticsMeasurement(m => m.HumidityPercent, "Humidity", StatisticKind.Max, count, location, start, stop);
+        var medianHumidity = StatisticsMeasurement(m => m.HumidityPercent, "Humidity", StatisticKind.Median, count, location, start, stop);
+        var minPressure = StatisticsMeasurement(m => m.PressureHectopascals, "Pressure", StatisticKind.Min, countWithPressure, location, start, stop, true);
+        var maxPressure = StatisticsMeasurement(m => m.PressureHectopascals, "Pressure", StatisticKind.Max, countWithPressure, location, start, stop, true);
+        var medianPressure = StatisticsMeasurement(m => m.PressureHectopascals, "Pressure", StatisticKind.Median, countWithPressure, location, start, stop, true);
+
         return new MeasurementStatistics
         {
             AverageTemperatureCelsius = await averageTemperatureCelsius,
             AverageHumidityPercent = await averageHumidityPercent,
             AveragePressureHectopascals = await averagePressureHectopascals,
+
             MinTemperature = await minTemperature,
-            MaxTemperature = await maxTemperature,
-            MinHumidity = await minHumidity,
-            MaxHumidity = await maxHumidity,
-            MinPressure = await minPressure,
-            MaxPressure = await maxPressure,
             MedianTemperature = await medianTemperature,
+            MaxTemperature = await maxTemperature,
+
+            MinHumidity = await minHumidity,
             MedianHumidity = await medianHumidity,
+            MaxHumidity = await maxHumidity,
+
+            MinPressure = await minPressure,
             MedianPressure = await medianPressure,
+            MaxPressure = await maxPressure,
         };
     }
 
     public async Task<Measurement> Add(Measurement measurement)
     {
-        var result = await Measurements.AddAsync(measurement);
-        await SaveChangesAsync();
+        var result = await dbContext.Measurements.AddAsync(measurement);
+        await dbContext.SaveChangesAsync();
         return result.Entity;
     }
 
     #region Helpers
 
-    private IQueryable<Measurement> FilteredMeasurements(string? location, DateTime? start, DateTime? stop)
+    private static IQueryable<Measurement> FilteredMeasurements(IQueryable<Measurement> measurements, string? location, DateTime? start, DateTime? stop)
     {
-        IQueryable<Measurement> filtered = Measurements;
+        var filtered = measurements;
         if (location != null)
         {
             filtered = filtered.Where(m => m.Location == location);
@@ -156,6 +145,67 @@ public sealed class MeasurementsRepository(IConfiguration configuration, ILogger
         }
 
         return filtered;
+    }
+
+    private static IQueryable<TResult> FilterNullValues<TResult, TField>(IQueryable<TResult> queryable, Expression<Func<TResult, TField>> fieldSelector)
+    {
+        var nullCheck = Expression.NotEqual(fieldSelector.Body, Expression.Constant(null));
+        return queryable.Where(Expression.Lambda<Func<TResult, bool>>(nullCheck, fieldSelector.Parameters));
+    }
+
+    private enum StatisticKind
+    {
+        Min,
+        Max,
+        Median,
+    }
+    private async Task<Measurement?> StatisticsMeasurement<TField>(
+        Expression<Func<Measurement, TField>> fieldSelector,
+        string fieldName,
+        StatisticKind kind,
+        long count,
+        string? location,
+        DateTime? start,
+        DateTime? stop,
+        bool filterForNull = false)
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync();
+        var queryable = FilteredMeasurements(context.Measurements.AsNoTracking(), location, start, stop)
+            .TagWith($"{kind} {fieldName}");
+        if (filterForNull) queryable = FilterNullValues(queryable, fieldSelector);
+        return kind switch
+        {
+            StatisticKind.Min => await queryable.OrderBy(fieldSelector).ThenBy(m => m.Id).FirstOrDefaultAsync(),
+            StatisticKind.Max => await queryable.OrderByDescending(fieldSelector).ThenByDescending(m => m.Id).FirstOrDefaultAsync(),
+            StatisticKind.Median => await queryable.OrderBy(fieldSelector).Skip((int)(count / 2)).FirstOrDefaultAsync(),
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
+        };
+    }
+
+    private async Task<double> AverageMeasurementField(
+        Expression<Func<Measurement, double>> fieldSelector,
+        string fieldName,
+        string? location,
+        DateTime? start,
+        DateTime? stop)
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync();
+        return await FilteredMeasurements(context.Measurements.AsNoTracking(), location, start, stop)
+            .TagWith($"Average {fieldName}")
+            .AverageAsync(fieldSelector);
+    }
+
+    private async Task<double?> AverageMeasurementField(
+        Expression<Func<Measurement, double?>> fieldSelector,
+        string fieldName,
+        string? location,
+        DateTime? start,
+        DateTime? stop)
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync();
+        return await FilterNullValues(FilteredMeasurements(context.Measurements.AsNoTracking(), location, start, stop), fieldSelector)
+            .TagWith($"Average {fieldName}")
+            .AverageAsync(fieldSelector);
     }
 
     #endregion

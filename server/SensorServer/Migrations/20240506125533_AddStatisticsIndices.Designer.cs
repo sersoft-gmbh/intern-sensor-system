@@ -4,21 +4,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SensorServer.Repositories;
+using SensorServer;
 
 #nullable disable
 
 namespace SensorServer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230417150008_CreateMeasurements")]
-    partial class CreateMeasurements
+    [Migration("20240506125533_AddStatisticsIndices")]
+    partial class AddStatisticsIndices
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
 
             modelBuilder.Entity("SensorServer.Models.Measurement", b =>
                 {
@@ -29,17 +29,31 @@ namespace SensorServer.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("TEXT");
 
-                    b.Property<float>("HumidityPercent")
+                    b.Property<double>("HumidityPercent")
                         .HasColumnType("REAL");
 
                     b.Property<string>("Location")
                         .IsRequired()
+                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
-                    b.Property<float>("TemperatureCelsius")
+                    b.Property<double?>("PressureHectopascals")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("TemperatureCelsius")
                         .HasColumnType("REAL");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Date");
+
+                    b.HasIndex("HumidityPercent");
+
+                    b.HasIndex("Location");
+
+                    b.HasIndex("PressureHectopascals");
+
+                    b.HasIndex("TemperatureCelsius");
 
                     b.ToTable("Measurements");
                 });

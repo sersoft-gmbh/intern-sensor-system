@@ -4,8 +4,8 @@ using SensorServer.Helpers;
 
 namespace SensorServer.Models;
 
-[Index(nameof(Date))]
-[Index(nameof(Location))]
+[Index(nameof(Date)), Index(nameof(Location))]
+[Index(nameof(TemperatureCelsius)), Index(nameof(HumidityPercent)), Index(nameof(PressureHectopascals))]
 public sealed class Measurement
 {
     [Range(0, long.MaxValue)]

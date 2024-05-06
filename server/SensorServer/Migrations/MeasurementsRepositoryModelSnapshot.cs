@@ -3,13 +3,13 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SensorServer.Repositories;
+using SensorServer;
 
 #nullable disable
 
 namespace SensorServer.Migrations
 {
-    [DbContext(typeof(MeasurementsRepository))]
+    [DbContext(typeof(ApplicationDbContext))]
     partial class MeasurementsRepositoryModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -44,7 +44,13 @@ namespace SensorServer.Migrations
 
                     b.HasIndex("Date");
 
+                    b.HasIndex("HumidityPercent");
+
                     b.HasIndex("Location");
+
+                    b.HasIndex("PressureHectopascals");
+
+                    b.HasIndex("TemperatureCelsius");
 
                     b.ToTable("Measurements");
                 });

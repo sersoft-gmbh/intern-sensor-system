@@ -38,7 +38,7 @@ jobs:
         with:
           dotnet-version: '8.0'
           cache: true
-          cache-dependency-path: '*/*.csproj'
+          cache-dependency-path: '**/*.csproj'
       - working-directory: server
         run: dotnet restore
 

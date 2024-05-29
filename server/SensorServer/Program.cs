@@ -69,6 +69,7 @@ await using (var scope = app.Services.CreateAsyncScope())
     await using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>())
     {
         await dbContext.Database.MigrateAsync();
+        await dbContext.Database.EnableWal(app.Configuration.GetValue<long?>("DbMaxJournalSize"));
     }
 }
 

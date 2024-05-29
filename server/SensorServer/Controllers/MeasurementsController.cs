@@ -32,33 +32,35 @@ public sealed class MeasurementsController(
 
     [HttpGet]
     [Route("{id:long}")]
-    public async Task<ActionResult<Measurement>> GetMeasurements([FromRoute] long id)
-        => ActionResultFor(await measurementsRepository.GetMeasurement(id));
+    public async Task<ActionResult<Measurement>> GetMeasurements([FromRoute] long id, CancellationToken cancellationToken = default)
+        => ActionResultFor(await measurementsRepository.GetMeasurement(id, cancellationToken));
 
     [HttpGet]
     [Route("latest")]
-    public async Task<ActionResult<Measurement>> GetLatestMeasurement([FromQuery] string? location)
-        => ActionResultFor(await measurementsRepository.GetLatestMeasurement(location));
+    public async Task<ActionResult<Measurement>> GetLatestMeasurement([FromQuery] string? location, CancellationToken cancellationToken = default)
+        => ActionResultFor(await measurementsRepository.GetLatestMeasurement(location, cancellationToken));
 
     [HttpGet]
     [Route("counts")]
     public async Task<MeasurementCounts> GetMeasurementCounts(
         [FromQuery] DateTime? start,
-        [FromQuery] DateTime? stop) =>
-        await measurementsRepository.GetMeasurementCounts(start, stop);
+        [FromQuery] DateTime? stop,
+        CancellationToken cancellationToken = default) =>
+        await measurementsRepository.GetMeasurementCounts(start, stop, cancellationToken);
 
     [HttpGet]
     [Route("statistics")]
     public async Task<MeasurementStatistics> GetMeasurementStatistics(
         [FromQuery] string? location,
         [FromQuery] DateTime? start,
-        [FromQuery] DateTime? stop) =>
-        await measurementsRepository.GetMeasurementStatistics(location, start, stop);
+        [FromQuery] DateTime? stop,
+        CancellationToken cancellationToken = default) =>
+        await measurementsRepository.GetMeasurementStatistics(location, start, stop, cancellationToken);
 
     [HttpPut]
     [Authorize]
-    public async Task<Measurement> PutMeasurement([FromBody] Measurement measurement)
-        => await measurementsRepository.Add(measurement);
+    public async Task<Measurement> PutMeasurement([FromBody] Measurement measurement, CancellationToken cancellationToken = default)
+        => await measurementsRepository.Add(measurement, cancellationToken);
 
     #region Helpers
     [NonAction]

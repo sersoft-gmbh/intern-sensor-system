@@ -1,17 +1,18 @@
 using SensorServer.Models;
+using UnitsNet;
 
 namespace SensorServer.Helpers;
 
 public static class HeatIndexCalculator
 {
-    public static double CalculateHeatIndexInFahrenheit(this Measurement measurement)
+    public static Temperature CalculateHeatIndex(this Measurement measurement)
     {
         var fahrenheit = measurement.TemperatureFahrenheit;
-        var humidityPercent = measurement.HumidityPercent * 100;
+        var humidityPercent = measurement.Humidity.Value;
 
         var heatIndex = 0.5 * (fahrenheit + 61 + (fahrenheit - 68) * 1.2 + humidityPercent * 0.094);
 
-        if (heatIndex <= 79) return heatIndex;
+        if (heatIndex <= 79) return Temperature.FromDegreesFahrenheit(heatIndex);
 
         heatIndex = -42.379 + 2.04901523 * fahrenheit + 10.14333127 * humidityPercent +
                     -0.22475541 * fahrenheit * humidityPercent +
@@ -31,6 +32,6 @@ public static class HeatIndexCalculator
                 break;
         }
 
-        return heatIndex;
+        return Temperature.FromDegreesFahrenheit(heatIndex);
     }
 }

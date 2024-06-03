@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using SensorServer;
 using SensorServer.Helpers;
 using SensorServer.Repositories;
+using SensorServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +62,8 @@ builder.Services.AddSwaggerGen(option =>
         },
     });
 });
+
+builder.Services.AddHostedService<DbCheckpointService>();
 
 var app = builder.Build();
 

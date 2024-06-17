@@ -14,7 +14,9 @@ updates:
       - ffried
 
   - package-ecosystem: nuget
-    directory: /server
+    directories: 
+      - /server
+      - /raspi/SensorPi
     schedule:
       interval: daily
       time: '07:00'
@@ -32,17 +34,6 @@ updates:
         patterns:
           - 'Microsoft.AspNetCore'
           - 'Microsoft.AspNetCore.*'
-
-  - package-ecosystem: nuget
-    directory: /raspi
-    schedule:
-      interval: daily
-      time: '07:00'
-      timezone: Europe/Berlin
-    assignees:
-      - ffried
-    reviewers:
-      - ffried
 
   - package-ecosystem: docker
     directory: /

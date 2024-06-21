@@ -76,7 +76,7 @@ jobs:
           registry: ${{ vars.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - uses: docker/build-push-action@v6.0.1
+      - uses: docker/build-push-action@v6.0.2
         with:
           pull: true
           push: true

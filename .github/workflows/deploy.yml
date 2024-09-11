@@ -137,7 +137,7 @@ jobs:
             | to_entries
             | map({"image": .key, "tags": .value})')"
           echo "payload=${JSON_PAYLOAD}" >> "${GITHUB_OUTPUT}"
-      - uses: fjogeleit/http-request-action@v1.16.1
+      - uses: fjogeleit/http-request-action@v1.16.2
         with:
           method: POST
           url: ${{ secrets.DEPLOYER_URL }}/api/v1/deploy

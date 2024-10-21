@@ -15,7 +15,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
-        <PackageReference Include="UnitsNet" Version="5.59.0" />
+        <PackageReference Include="UnitsNet" Version="5.60.0" />
     </ItemGroup>
 
 </Project>

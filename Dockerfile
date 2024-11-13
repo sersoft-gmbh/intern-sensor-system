@@ -53,7 +53,7 @@ dotnet publish --no-restore \
 EOC
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 
 ARG VERSION
 

@@ -6,54 +6,58 @@ using SensorPi.Controllers;
 
 namespace SensorPi.Accessories;
 
-public sealed class IrRemote(string remoteName, LocationsController locationsController, NightModeController nightModeController) : IDisposable 
+public sealed class IrRemote(string name, LocationsController locationsController, NightModeController nightModeController) : IDisposable
 {
-    const string IrSocketName = "/var/run/lirc/lircd";
-
-    private readonly string _remoteName = remoteName;
-    private readonly LocationsController _locationsController = locationsController;
-    private readonly NightModeController _nightModeController = nightModeController;
+    private const string IrSocketName = "/var/run/lirc/lircd";
 
     private CancellationTokenSource _cancellationSource = new();
     private Task? _readingTask;
 
+    ~IrRemote() => Dispose(false);
+
     public void Dispose() 
     {
-        _cancellationSource.Dispose();
+        Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (disposing)
+            _cancellationSource.Dispose();
     }
 
     private async Task HandleIrKey(string remoteName, string keyCommand) 
     {
-        if (remoteName != _remoteName) return;
+        if (remoteName != name) return;
         switch (keyCommand) {
             case "KEY_A": break;
             case "KEY_B": break;
             case "KEY_C": break;
             case "KEY_X": 
-                await _nightModeController.ToggleNightMode();
+                await nightModeController.ToggleNightMode();
                 break; 
             case "KEY_UP":
-                await _locationsController.SwitchCurrentLocationBy(1);
+                await locationsController.SwitchCurrentLocationBy(1);
                 break;
             case "KEY_DOWN": 
-                await _locationsController.SwitchCurrentLocationBy(-1);
+                await locationsController.SwitchCurrentLocationBy(-1);
                 break;
             case "KEY_RIGHT":
-                await _locationsController.SwitchCurrentLocationBy(1);
+                await locationsController.SwitchCurrentLocationBy(1);
                 break;
             case "KEY_LEFT": 
-                await _locationsController.SwitchCurrentLocationBy(-1);
+                await locationsController.SwitchCurrentLocationBy(-1);
                 break;
             case "KEY_0": break;
             case "KEY_1":
-                await _locationsController.SwitchCurrentLocationTo(0);
+                await locationsController.SwitchCurrentLocationTo(0);
                 break;
             case "KEY_2":
-                await _locationsController.SwitchCurrentLocationTo(1);
+                await locationsController.SwitchCurrentLocationTo(1);
                 break;
             case "KEY_3": 
-                await _locationsController.SwitchCurrentLocationTo(2);
+                await locationsController.SwitchCurrentLocationTo(2);
                 break;
             case "KEY_4": break;
             case "KEY_5": break;
@@ -90,10 +94,10 @@ public sealed class IrRemote(string remoteName, LocationsController locationsCon
             Debug.WriteLine("Socket seems to have closed...");
     }
 
-    public void StartReceivingSignals() 
+    public async Task StartReceivingSignals()
     {
-        if (_readingTask != null) _cancellationSource.Cancel();
-        _cancellationSource = new();
+        if (_readingTask != null) await _cancellationSource.CancelAsync();
+        _cancellationSource = new CancellationTokenSource();
         _readingTask = Task.Run(async () => {
             while (!_cancellationSource.IsCancellationRequested)
                 await CheckSignalAsync(_cancellationSource.Token);
@@ -102,7 +106,7 @@ public sealed class IrRemote(string remoteName, LocationsController locationsCon
 
     public async Task StopReceivingSignals() 
     {
-        _cancellationSource.Cancel();
+        await _cancellationSource.CancelAsync();
         if (_readingTask != null) {
             await _readingTask;
             _readingTask = null;

@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using SensorServer.Repositories;
 
@@ -10,5 +11,7 @@ public sealed class LocationsController(MeasurementsRepository measurementsRepos
     private readonly ILogger<LocationsController> _logger = logger;
 
     [HttpGet]
+    [ProducesResponseType<string[]>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
+    [EndpointSummary("Returns the list of locations.")]
     public IAsyncEnumerable<string> GetLocations() => measurementsRepository.AllLocations();
 }

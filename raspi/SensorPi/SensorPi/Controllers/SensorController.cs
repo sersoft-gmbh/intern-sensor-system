@@ -10,21 +10,25 @@ where TTemperatureSensor : ITemperatureSensor
 {
     private readonly TTemperatureSensor _sensor = sensor;
 
-    private readonly WideDisplay? _display = display;
-    private readonly StatusLight? _statusLight = statusLight;
-
     private Timer? _readingTimer;
+
+    ~SensorsController() => Dispose(false);
 
     public void Dispose()
     {
-        _readingTimer?.Dispose();
+        Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (disposing) _readingTimer?.Dispose();
     }
 
     private async Task SetColor(LedColor color) 
     {
-        if (_statusLight == null) return;
-        await _statusLight.SetColor(color);
+        if (statusLight == null) return;
+        await statusLight.SetColor(color);
     }
 
     private async Task TimerTick(LocationsController locationsController, ServerController server) 
@@ -47,8 +51,8 @@ where TTemperatureSensor : ITemperatureSensor
             current.Value.Temperature.DegreesCelsius, 
             current.Value.Humidity.Percent / 100,
             current.Value.Pressure?.Hectopascals);
-        if (_display != null)
-            await _display.WriteMeasurement(measurement);
+        if (display != null)
+            await display.WriteMeasurement(measurement);
 
         var results = new List<ValidationResult>();
         if (!Validator.TryValidateObject(measurement, new ValidationContext(measurement, null, null), results, true))

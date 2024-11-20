@@ -10,12 +10,11 @@ public sealed class LocationsController(WideDisplay? display = null)
         "Bedroom",
     ];
 
-    private readonly object locker = new();
-    private int _currentLocationIndex = 0;
-    private readonly WideDisplay? _display = display;
+    private readonly Lock _lock = new();
+    private int _currentLocationIndex;
 
     public string GetCurrentLocation() {
-        lock(locker) return Locations[_currentLocationIndex];
+        lock(_lock) return Locations[_currentLocationIndex];
     } 
 
     public async Task SwitchCurrentLocationTo(int index) 
@@ -28,19 +27,19 @@ public sealed class LocationsController(WideDisplay? display = null)
                 index +=  Locations.Length;
             }
         }     
-        lock(locker) {
+        lock(_lock) {
             if (index == _currentLocationIndex) return;
             _currentLocationIndex = index;
         }
-        if (_display != null)
-            await _display.ShowActivityIndicator();
+        if (display != null)
+            await display.ShowActivityIndicator();
     }
 
     public async Task SwitchCurrentLocationBy(int diff) 
     {
         if (diff == 0) return;
         int currentIndex;
-        lock(locker) currentIndex = _currentLocationIndex;
+        lock(_lock) currentIndex = _currentLocationIndex;
         await SwitchCurrentLocationTo(currentIndex + diff);
     }
 }

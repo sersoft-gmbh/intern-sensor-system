@@ -12,7 +12,8 @@ namespace SensorServer.Models;
 public sealed class Measurement
 {
     [Key]
-    [Range(0, long.MaxValue)]
+    // [Range(1, long.MaxValue)]
+    [Range(typeof(long), "1", "9223372036854775807")] // Needed until https://github.com/dotnet/aspnetcore/pull/59043 is merged.
     public long? Id { get; set; }
     public DateTime Date { get; set; }
     [MinLength(3), MaxLength(128)]

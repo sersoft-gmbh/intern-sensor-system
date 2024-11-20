@@ -5,25 +5,29 @@ using SensorPi.Models;
 
 namespace SensorPi.Accessories.Temperature;
 
-public sealed class SimpleTemperatureSensor : ITemperatureSensor {
+public sealed class SimpleTemperatureSensor(int pin, GpioController? gpioController = null) : ITemperatureSensor
+{
     private static readonly TimeSpan ReadDelay = TimeSpan.FromSeconds(1);
 
-    private readonly Dht11 _dht;
+    private readonly Dht11 _dht = new(pin, PinNumberingScheme.Logical, gpioController, gpioController == null)
+    {
+        MinTimeBetweenReads = ReadDelay,
+    };
    
     private DateTime _lastRead = DateTime.MinValue;
 
-    public SimpleTemperatureSensor(int pin, GpioController? gpioController = null)
-    {
-        _dht = new Dht11(pin, PinNumberingScheme.Logical, gpioController, gpioController == null)
-        {
-            MinTimeBetweenReads = ReadDelay,
-        };
-    }
+    ~SimpleTemperatureSensor() => Dispose(false);
 
     public void Dispose()
     {
-        _dht.Dispose();
+        Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!disposing) return;
+        _dht.Dispose();
     }
 
     private TemperatureValues? ReadCurrentSync() {
@@ -39,7 +43,5 @@ public sealed class SimpleTemperatureSensor : ITemperatureSensor {
     }
 
     public async ValueTask<TemperatureValues?> ReadCurrent()
-    {
-        return await Task.Run(ReadCurrentSync);
-    }
+        => await Task.Run(ReadCurrentSync);
 }

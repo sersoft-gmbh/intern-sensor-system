@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine as buildnode
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0-alpine as buildnode
 
 ARG TARGETPLATFORM
 ARG VERSION
@@ -42,7 +42,7 @@ if echo "${VERSION}" | grep -Eq '^[0-9]+.[0-9]+.[0-9]+'; then
 else
   PROJECT_VERSION="0.0.1-${VERSION}"
 fi
-rm -f appsettings.Development.json
+rm -f SensorServer/appsettings.Development.json
 unset VERSION
 dotnet publish --no-restore \
   --configuration release \
@@ -53,7 +53,7 @@ dotnet publish --no-restore \
 EOC
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 
 ARG VERSION
 

@@ -10,7 +10,7 @@ public sealed class WideDisplay : IDisposable {
     private readonly I2cDevice _i2c;
     private readonly Lcd1602 _lcd;
 
-    private readonly object _activityIndicatorLock = new();
+    private readonly Lock _activityIndicatorLock = new();
     private Timer? _activityIndicatorTimer;
 
     private bool IsShowingActivityIndicator
@@ -40,13 +40,21 @@ public sealed class WideDisplay : IDisposable {
         CreateCustomCharacters();
     }
 
+    ~WideDisplay() => Dispose(false);
+
     public void Dispose()
      {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!disposing) return;
         _activityIndicatorTimer?.Dispose();
         _lcd.Clear();
         _lcd.Dispose();
         _i2c.Dispose();
-        GC.SuppressFinalize(this);
     }
 
     private void WriteTextAtPosition(Position pos, string text)

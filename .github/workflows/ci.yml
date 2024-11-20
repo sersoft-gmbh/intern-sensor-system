@@ -1,4 +1,4 @@
-name: Deploy Docker Image
+name: CI
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
         with:
           filters: |
             workflow:
-              - '.github/workflows/deploy.yml'
+              - '.github/workflows/ci.yml'
             docker:
               - 'bin/**'
               - 'Dockerfile'

@@ -7,14 +7,14 @@ namespace SensorPi.Accessories;
 public sealed class StatusLight : BaseGpioAccessory {
     private readonly int _redPin, _greenPin, _bluePin;
 
-    private readonly object locker = new();
+    private readonly Lock _lock = new();
     private bool _isOff;
     
     public bool IsOn 
     {
         get => !_isOff;
         set {
-            lock(locker) {
+            lock(_lock) {
                 _isOff = !value;
             }
             if (!value)
@@ -41,7 +41,7 @@ public sealed class StatusLight : BaseGpioAccessory {
 
     private void WriteColor(LedColor color) 
     {
-        lock(locker) {
+        lock(_lock) {
             Gpio.Write(_redPin, color.HasRed() ? PinValue.High : PinValue.Low);
             Gpio.Write(_greenPin, color.HasGreen() ? PinValue.High : PinValue.Low);
             Gpio.Write(_bluePin, color.HasBlue() ? PinValue.High : PinValue.Low);

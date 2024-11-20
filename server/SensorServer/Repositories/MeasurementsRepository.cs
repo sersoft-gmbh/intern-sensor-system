@@ -26,10 +26,10 @@ public sealed class MeasurementsRepository(
         switch (sortDirection)
         {
             case SortDirection.Ascending:
-                filtered = filtered.OrderBy(m => m.Date);
+                filtered = filtered.OrderBy(m => m.Date).ThenBy(m => m.Id);
                 break;
             case SortDirection.Descending:
-                filtered = filtered.OrderByDescending(m => m.Date);
+                filtered = filtered.OrderByDescending(m => m.Date).ThenByDescending(m => m.Id);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(sortDirection), sortDirection, null);
@@ -39,13 +39,14 @@ public sealed class MeasurementsRepository(
     }
 
     public async Task<Measurement?> GetMeasurement(long id, CancellationToken cancellationToken = default)
-        => await dbContext.Measurements.FindAsync(id, cancellationToken);
+        => await dbContext.Measurements.FindAsync([id], cancellationToken);
 
     public async Task<Measurement?> GetLatestMeasurement(string? location, CancellationToken cancellationToken = default)
     {
         return await FilteredMeasurements(dbContext.Measurements.AsNoTracking(), location, null, null)
             .TagWith(nameof(GetLatestMeasurement))
             .OrderByDescending(m => m.Date)
+            .ThenByDescending(m => m.Id)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

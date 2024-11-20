@@ -39,7 +39,7 @@ using var irRemote = new IrRemote(IrRemoteName, locationsController, nightModeCo
 
 try {
     sensorsController.StartReading(serverController, locationsController);
-    irRemote.StartReceivingSignals();
+    await irRemote.StartReceivingSignals();
     await Task.Delay(Timeout.Infinite);
 } finally {
     sensorsController.StopReading();

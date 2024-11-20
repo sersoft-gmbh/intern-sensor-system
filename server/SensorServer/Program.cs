@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 using SensorServer;
 using SensorServer.Helpers;
+using SensorServer.OpenApi.DocumentTransformers;
+using SensorServer.OpenApi.OperationTransformers;
 using SensorServer.Repositories;
 using SensorServer.Services;
 
@@ -33,34 +37,16 @@ builder.Services
         options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer())))
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter()));
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(option =>
+builder.Services.AddOpenApi(options =>
 {
-    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Sensor Server", Version = "v1" });
-    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
+    options.AddDocumentTransformer((document, _, _) =>
     {
-        In = ParameterLocation.Header,
-        Description = "Please enter a valid token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        BearerFormat = "Custom",
-        Scheme = "Bearer",
+        document.Info = new OpenApiInfo { Title = "Sensor Server", Version = "v1" };
+        return Task.CompletedTask;
     });
-    option.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer",
-                },
-            },
-            Array.Empty<string>()
-        },
-    });
+    options.AddDocumentTransformer<AuthorizationDocumentTransformer>();
+    options.AddOperationTransformer<AuthorizedOperationTransformer>();
 });
 
 builder.Services.AddHostedService<DbCheckpointService>();
@@ -79,8 +65,18 @@ await using (var scope = app.Services.CreateAsyncScope())
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.Servers =
+        [
+            new ScalarServer("http://localhost:5076", "Localhost"),
+        ];
+    });
+    app.MapGet("/swagger", () => Results.Redirect("/scalar/v1"))
+        .ExcludeFromDescription();
+    app.MapGet("/scalar", () => Results.Redirect("/scalar/v1"))
+        .ExcludeFromDescription();
 }
 
 app.UseHttpLogging();

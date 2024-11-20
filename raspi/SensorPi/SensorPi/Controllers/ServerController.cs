@@ -18,10 +18,17 @@ public sealed class ServerController : IDisposable {
     {
     }
 
+    ~ServerController() => Dispose(false);
+
     public void Dispose()
     {
-        _httpClient.Dispose();
+        Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (disposing) _httpClient.Dispose();
     }
 
     public async Task SendMeasurement(Measurement measurement)

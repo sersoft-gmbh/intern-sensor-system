@@ -35,7 +35,7 @@ public sealed class MeasurementsController(
     [EndpointSummary("Returns the measurement with the given id.")]
     public async Task<ActionResult<Measurement>> GetMeasurements(
         [FromRoute, Description("The id of the measurement to return")] long id,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
         => ActionResultFor(await measurementsRepository.GetMeasurement(id, cancellationToken));
 
     [HttpGet]
@@ -44,7 +44,7 @@ public sealed class MeasurementsController(
     [EndpointSummary("Returns the latest measurement.")]
     public async Task<ActionResult<Measurement>> GetLatestMeasurement(
         [FromQuery, Description("Only include measurements from this location")] string? location,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
         => ActionResultFor(await measurementsRepository.GetLatestMeasurement(location, cancellationToken));
 
     [HttpGet]
@@ -54,7 +54,7 @@ public sealed class MeasurementsController(
     public async Task<MeasurementCounts> GetMeasurementCounts(
         [FromQuery, Description("Only include measurements at or after this date")] DateTime? start,
         [FromQuery, Description("Only include measurements at or before this date")] DateTime? stop,
-        CancellationToken cancellationToken = default) =>
+        CancellationToken cancellationToken) =>
         await measurementsRepository.GetMeasurementCounts(start, stop, cancellationToken);
 
     [HttpGet]
@@ -65,7 +65,7 @@ public sealed class MeasurementsController(
         [FromQuery, Description("Only include measurements from this location")] string? location,
         [FromQuery, Description("Only include measurements at or after this date")] DateTime? start,
         [FromQuery, Description("Only include measurements at or before this date")] DateTime? stop,
-        CancellationToken cancellationToken = default) =>
+        CancellationToken cancellationToken) =>
         await measurementsRepository.GetMeasurementStatistics(location, start, stop, cancellationToken);
 
     [HttpPut]
@@ -74,7 +74,7 @@ public sealed class MeasurementsController(
     [ProducesResponseType<Measurement>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, MediaTypeNames.Application.Json)]
     [EndpointSummary("Creates a new measurement.")]
-    public async Task<Measurement> PutMeasurement([FromBody] Measurement measurement, CancellationToken cancellationToken = default)
+    public async Task<Measurement> PutMeasurement([FromBody] Measurement measurement, CancellationToken cancellationToken)
         => await measurementsRepository.Add(measurement, cancellationToken);
 
     #region Helpers

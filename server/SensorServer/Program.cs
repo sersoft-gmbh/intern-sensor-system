@@ -7,6 +7,7 @@ using SensorServer;
 using SensorServer.Helpers;
 using SensorServer.OpenApi.DocumentTransformers;
 using SensorServer.OpenApi.OperationTransformers;
+using SensorServer.OpenApi.SchemaTransformers;
 using SensorServer.Repositories;
 using SensorServer.Services;
 
@@ -29,7 +30,7 @@ builder.Services
     .AddScheme<SimpleTokenAuthenticationOptions, SimpleTokenAuthenticationHandler>("Bearer", options =>
     {
         options.AllowedTokens = builder.Configuration.GetSection("AllowedTokens").Get<IReadOnlySet<string>>() ??
-                                new SortedSet<string>();
+                                new HashSet<string>();
     });
 
 builder.Services
@@ -45,6 +46,7 @@ builder.Services.AddOpenApi(options =>
         document.Info = new OpenApiInfo { Title = "Sensor Server", Version = "v1" };
         return Task.CompletedTask;
     });
+    options.AddSchemaTransformer<DescriptionSchemaTransformer>();
     options.AddDocumentTransformer<AuthorizationDocumentTransformer>();
     options.AddOperationTransformer<AuthorizedOperationTransformer>();
 });

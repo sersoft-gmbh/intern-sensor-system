@@ -15,7 +15,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
         <PackageReference Include="Scalar.AspNetCore" Version="1.2.53" />
-        <PackageReference Include="UnitsNet" Version="5.60.0" />
+        <PackageReference Include="UnitsNet" Version="5.61.0" />
     </ItemGroup>
 
 </Project>

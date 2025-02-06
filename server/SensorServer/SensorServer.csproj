@@ -14,7 +14,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.1" />
-        <PackageReference Include="Scalar.AspNetCore" Version="2.0.9" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.0.11" />
         <PackageReference Include="UnitsNet" Version="5.69.0" />
     </ItemGroup>
 
